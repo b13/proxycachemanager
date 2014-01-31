@@ -23,4 +23,4 @@ Whenever a cacheable frontend page is now called, the full URL is stored in a ca
 
 Credits
 -------
-The extension was created taken all the great from Andreas XXXXXXX, Tom Rüther into account, as well as moc_varnish and cacheinfo as great work.
+The extension was created taken all the great from Andreas Gellhaus, Tom Rüther into account, as well as moc_varnish and cacheinfo as great work before.
