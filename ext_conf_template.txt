@@ -1,0 +1,5 @@
+# cat=basic/enable; type=options[Varnish via Curl/HTTP=B13_Proxycachemanager_Provider_VarnishHttpProxyProvider,Nginx via Curl/HTTP=B13_Proxycachemanager_Provider_CurlHttpProxyProvider]; label=Choose the reverse proxy (and its provider to connect to the provider)
+reverseProxyProvider = B13_Proxycachemanager_Provider_VarnishHttpProxyProvider
+
+# cat=basic/enable; type=string; label=Define the IP/hostname of the reverse proxy. Use multiple hosts as a comma-separated list, also, you can use {hostname}, {requestpath} to make PURGE calls dynamically. Useful for nginx. Usually http://127.0.0.1:8023/{path} should do the trick
+reverseProxyEndpoints = http://{hostname}/purge/{path}
