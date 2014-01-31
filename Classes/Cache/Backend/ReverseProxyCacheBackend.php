@@ -49,6 +49,7 @@ class ReverseProxyCacheBackend extends \TYPO3\CMS\Core\Cache\Backend\Typo3Databa
 			throw new \InvalidArgumentException('Invalid cache proxy provider for Reverse Proxy Cache', 1231267264);
 		} else {
 			try {
+				$className = str_replace('_', '\\', $className);
 				$this->reverseProxyProvider = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance($className);
 			} catch (\Exception $e) {
 				throw new \InvalidArgumentException('Invalid cache proxy provider class for Reverse Proxy Cache - Class "' . $className . '" not found.', 1231267264);

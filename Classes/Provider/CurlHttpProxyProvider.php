@@ -85,7 +85,7 @@ class CurlHttpProxyProvider implements ProxyProviderInterface, \TYPO3\CMS\Core\S
 
 			foreach ($this->queue as $urlToFlush) {
 				foreach ($this->proxyEndpoints as $proxyEndpoint) {
-					$curlHandle = $this->getCurlHandleForCacheClearing($urlToFlush, $proxyEndpoint);
+					$curlHandle = $this->getCurlHandleForPurgeHttpRequest($urlToFlush, $proxyEndpoint);
 					$curlHandles[] = $curlHandle;
 					curl_multi_add_handle($curlQueueHandler, $curlHandle);
 				}
@@ -105,7 +105,6 @@ class CurlHttpProxyProvider implements ProxyProviderInterface, \TYPO3\CMS\Core\S
 			}
 
 			foreach ($curlHandles as $curlHandle) {
-				curl_close($curlHandle);
 				curl_multi_remove_handle($curlQueueHandler, $curlHandle);
 			}
 
@@ -129,8 +128,7 @@ class CurlHttpProxyProvider implements ProxyProviderInterface, \TYPO3\CMS\Core\S
 			$endpointUrl
 		);
 
-		$curlHandle = curl_init();
-		curl_setopt($curlHandle, CURLOPT_URL, $endpointUrl);
+		$curlHandle = curl_init($finalEndpointUrl);
 		curl_setopt($curlHandle, CURLOPT_CUSTOMREQUEST, 'PURGE');
 		curl_setopt($curlHandle, CURLOPT_HEADER, 0);
 		curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, 1);
