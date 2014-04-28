@@ -47,8 +47,9 @@ interface ProxyProviderInterface {
 
 	/**
 	 * flushes the whole proxy cache
+	 * @param $urls
 	 * @return void
 	 */
-	public function flushAllUrls();
+	public function flushAllUrls($urls = array());
 
 }

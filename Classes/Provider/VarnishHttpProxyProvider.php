@@ -35,4 +35,11 @@ namespace B13\Proxycachemanager\Provider;
  */
 class VarnishHttpProxyProvider extends CurlHttpProxyProvider {
 
+	/**
+	 * flushes the whole proxy cache (directly)
+	 */
+	public function flushAllUrls($urls = array()) {
+		$this->queue = array('.*');
+		$this->executeCacheFlush();
+	}
 }

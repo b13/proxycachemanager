@@ -65,10 +65,11 @@ class CurlHttpProxyProvider implements ProxyProviderInterface, \TYPO3\CMS\Core\S
 	}
 
 	/**
-	 * flushes the whole proxy cache (directlry)
+	 * flushes all proxy cache URLs
 	 */
-	public function flushAllUrls() {
-		$this->queue = array('.*');
+	public function flushAllUrls($urls = array()) {
+		// SQL query to fetch all URLs
+		$this->queue = $urls;
 		$this->executeCacheFlush();
 	}
 
@@ -128,10 +129,17 @@ class CurlHttpProxyProvider implements ProxyProviderInterface, \TYPO3\CMS\Core\S
 			$endpointUrl
 		);
 
+		$this->getLogObject()->info(
+			'Purging "%s" on endpoint "%s"',
+			array($finalEndpointUrl, $urlToPurge)
+		);
+
 		$curlHandle = curl_init($finalEndpointUrl);
 		curl_setopt($curlHandle, CURLOPT_CUSTOMREQUEST, 'PURGE');
 		curl_setopt($curlHandle, CURLOPT_HEADER, 0);
 		curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($curlHandle, CURLOPT_SSL_VERIFYPEER, 0);
+		curl_setopt($curlHandle, CURLOPT_SSL_VERIFYHOST, 0);
 		return $curlHandle;
 	}
 
@@ -140,6 +148,17 @@ class CurlHttpProxyProvider implements ProxyProviderInterface, \TYPO3\CMS\Core\S
 	 */
 	public function __destruct() {
 		$this->executeCacheFlush();
+	}
+
+	/**
+	 * return \TYPO3\CMS\Core\Log\Logger
+	 */
+	protected function getLogObject() {
+		static $logObject;
+		if (!$logObject) {
+			$logObject = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\CMS\Core\Log\LogManager')->getLogger(__CLASS__);
+		}
+		return $logObject;
 	}
 
 }

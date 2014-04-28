@@ -95,10 +95,13 @@ class ReverseProxyCacheBackend extends \TYPO3\CMS\Core\Cache\Backend\Typo3Databa
 	 * @return void
 	 */
 	public function flush() {
+
+		$urls = $this->getAllCachedUrls();
+
 		parent::flush();
 
 		// make the HTTP Purge call
-		$this->reverseProxyProvider->flushAllUrls();
+		$this->reverseProxyProvider->flushAllUrls($urls);
 	}
 
 	/**
@@ -118,5 +121,17 @@ class ReverseProxyCacheBackend extends \TYPO3\CMS\Core\Cache\Backend\Typo3Databa
 		}
 
 		parent::flushByTag($tag);
+	}
+	
+	/**
+	 * fetch all URLs in the cache
+	 */
+	public function getAllCachedUrls() {
+		$urls = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows('content', $this->cacheTable, '', '', '', '', 'content');
+		if (is_array($urls)) {
+			return array_keys($urls);
+		} else {
+			return array();
+		}
 	}
 }

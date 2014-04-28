@@ -45,10 +45,38 @@ class FrontendHook {
 	 */
 	public function addCacheableUrlToProxyCache($parameters, \TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController $parentObject) {
 
-		$url = \TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('TYPO3_REQUEST_URL');
+		$cache = $GLOBALS['typo3CacheManager']->getCache('tx_proxy');
 		$pageUid = $parentObject->id;
 
-		$cache = $GLOBALS['typo3CacheManager']->getCache('tx_proxy');
+		// cache the page URL that was called
+		$url = \TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('TYPO3_REQUEST_URL');
 		$cache->set(md5($url), $url, array('pageId_' . $pageUid));
+		$this->getLogObject()->info(
+			'Marking page "%s" (uid %s) as cached.',
+			array($url, $pageUid)
+		);
+
+
+		foreach ($parentObject->imagesOnPage as $imageUrl) {
+			$url = \TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('TYPO3_SITE_URL') . $imageUrl;
+			$cache->set(md5($url), $url, array('pageId_' . $pageUid));
+			$this->getLogObject()->info(
+				'Marking image "%s" (on page %s) as cached.',
+				array($url, $pageUid)
+			);
+
+		}
+
+	}
+
+	/**
+	 * return \TYPO3\CMS\Core\Log\Logger
+	 */
+	protected function getLogObject() {
+		static $logObject;
+		if (!$logObject) {
+			$logObject = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\CMS\Core\Log\LogManager')->getLogger(__CLASS__);
+		}
+		return $logObject;
 	}
 }
