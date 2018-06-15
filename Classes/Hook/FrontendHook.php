@@ -46,6 +46,9 @@ class FrontendHook
      */
     public function addCacheableUrlToProxyCache($parameters, TypoScriptFrontendController $parentObject)
     {
+        if (!$GLOBALS['TYPO3_CONF_VARS']['SYS']['reverseProxyIP']) {
+             return;
+        }
         try {
             $cache = GeneralUtility::makeInstance(CacheManager::class)->getCache('tx_proxy');
             $pageUid = $parentObject->id;

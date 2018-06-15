@@ -80,6 +80,9 @@ class ReverseProxyCacheBackend extends Typo3DatabaseBackend
      */
     public function remove($entryIdentifier)
     {
+        if (!$GLOBALS['TYPO3_CONF_VARS']['SYS']['reverseProxyIP']) {
+             return;
+        }
         // call the provider to forget this URL
         $url = $this->get($entryIdentifier);
         if ($url) {
@@ -95,6 +98,9 @@ class ReverseProxyCacheBackend extends Typo3DatabaseBackend
      */
     public function flush()
     {
+        if (!$GLOBALS['TYPO3_CONF_VARS']['SYS']['reverseProxyIP']) {
+             return;
+        }
         $urls = $this->getAllCachedUrls();
         parent::flush();
 
@@ -109,6 +115,9 @@ class ReverseProxyCacheBackend extends Typo3DatabaseBackend
      */
     public function flushByTag($tag)
     {
+        if (!$GLOBALS['TYPO3_CONF_VARS']['SYS']['reverseProxyIP']) {
+             return;
+        }
         $identifiers = $this->findIdentifiersByTag($tag);
         foreach ($identifiers as $entryIdentifier) {
             $url = $this->get($entryIdentifier);
