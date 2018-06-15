@@ -1,5 +1,6 @@
 <?php
-declare(strict_types=1);
+
+declare(strict_types = 1);
 
 namespace B13\Proxycachemanager\Hook;
 
@@ -24,7 +25,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 /**
- * Class containing frontend-related hooks
+ * Class containing frontend-related hooks.
  */
 class FrontendHook
 {
@@ -40,7 +41,7 @@ class FrontendHook
      * once (!) as the URL is cacheable, next time it is fetched
      * from the reverse proxy directly.
      *
-     * @param array $parameters
+     * @param array                        $parameters
      * @param TypoScriptFrontendController $parentObject
      */
     public function addCacheableUrlToProxyCache($parameters, TypoScriptFrontendController $parentObject)
@@ -78,6 +79,7 @@ class FrontendHook
         if (!$this->logger) {
             $this->logger = GeneralUtility::makeInstance(LogManager::class)->getLogger('b13.proxy.cache.populate');
         }
+
         return $this->logger;
     }
 }

@@ -1,5 +1,6 @@
 <?php
-declare(strict_types=1);
+
+declare(strict_types = 1);
 
 namespace B13\Proxycachemanager\Provider;
 
@@ -27,16 +28,16 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class CurlHttpProxyProvider implements ProxyProviderInterface, SingletonInterface
 {
-
     /**
-     * a queue so that within one request, the flush request is only done once (see executeCacheFlush())
+     * a queue so that within one request, the flush request is only done once (see executeCacheFlush()).
      *
      * @var array
      */
     protected $queue = [];
 
     /**
-     * a list of URLs of the proxy endpoints to be called
+     * a list of URLs of the proxy endpoints to be called.
+     *
      * @var array
      */
     protected $proxyEndpoints = [];
@@ -47,7 +48,7 @@ class CurlHttpProxyProvider implements ProxyProviderInterface, SingletonInterfac
     protected $logger;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setProxyEndpoints($endpoints)
     {
@@ -55,7 +56,7 @@ class CurlHttpProxyProvider implements ProxyProviderInterface, SingletonInterfac
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function flushCacheForUrl($url)
     {
@@ -63,7 +64,7 @@ class CurlHttpProxyProvider implements ProxyProviderInterface, SingletonInterfac
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function flushAllUrls($urls = [])
     {
@@ -73,8 +74,7 @@ class CurlHttpProxyProvider implements ProxyProviderInterface, SingletonInterfac
     }
 
     /**
-     * calls the reverse proxy via a URL cache
-     * @return void
+     * calls the reverse proxy via a URL cache.
      */
     protected function executeCacheFlush()
     {
@@ -82,7 +82,7 @@ class CurlHttpProxyProvider implements ProxyProviderInterface, SingletonInterfac
             $this->queue = array_unique($this->queue);
 
             $curlQueueHandler = curl_multi_init();
-            $curlHandles = array();
+            $curlHandles = [];
 
             foreach ($this->queue as $urlToFlush) {
                 foreach ($this->proxyEndpoints as $proxyEndpoint) {
@@ -95,13 +95,13 @@ class CurlHttpProxyProvider implements ProxyProviderInterface, SingletonInterfac
             $active = null;
             do {
                 $multiExecResult = curl_multi_exec($curlQueueHandler, $active);
-            } while ($multiExecResult == CURLM_CALL_MULTI_PERFORM);
+            } while (CURLM_CALL_MULTI_PERFORM == $multiExecResult);
 
-            while ($active && $multiExecResult == CURLM_OK) {
+            while ($active && CURLM_OK == $multiExecResult) {
                 if (curl_multi_select($curlQueueHandler) != -1) {
                     do {
                         $multiExecResult = curl_multi_exec($curlQueueHandler, $active);
-                    } while ($multiExecResult == CURLM_CALL_MULTI_PERFORM);
+                    } while (CURLM_CALL_MULTI_PERFORM == $multiExecResult);
                 }
             }
 
@@ -116,18 +116,19 @@ class CurlHttpProxyProvider implements ProxyProviderInterface, SingletonInterfac
     }
 
     /**
-     * Instantiates a curl handle in order to call
+     * Instantiates a curl handle in order to call.
      *
-     * @param string $urlToPurge The URL that should be cleared
+     * @param string $urlToPurge  The URL that should be cleared
      * @param string $endpointUrl the URL of the proxy server that deals with the purging
+     *
      * @return resource
      */
     protected function getCurlHandleForPurgeHttpRequest($urlToPurge, $endpointUrl)
     {
         $urlParts = parse_url($urlToPurge);
         $finalEndpointUrl = str_replace(
-            array('{scheme}', '{host}', '{port}', '{user}', '{pass}', '{path}', '{query}', '{fragment}', '{url}'),
-            array(
+            ['{scheme}', '{host}', '{port}', '{user}', '{pass}', '{path}', '{query}', '{fragment}', '{url}'],
+            [
                 $urlParts['scheme'],
                 $urlParts['host'],
                 $urlParts['port'],
@@ -136,8 +137,8 @@ class CurlHttpProxyProvider implements ProxyProviderInterface, SingletonInterfac
                 trim($urlParts['path'], '/'),
                 $urlParts['query'],
                 $urlParts['fragment'],
-                $urlToPurge
-            ),
+                $urlToPurge,
+            ],
             $endpointUrl
         );
 
@@ -152,11 +153,12 @@ class CurlHttpProxyProvider implements ProxyProviderInterface, SingletonInterfac
         curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curlHandle, CURLOPT_SSL_VERIFYPEER, 0);
         curl_setopt($curlHandle, CURLOPT_SSL_VERIFYHOST, 0);
+
         return $curlHandle;
     }
 
     /**
-     * call the execution of the HTTP requests (queue worker)
+     * call the execution of the HTTP requests (queue worker).
      */
     public function __destruct()
     {
@@ -171,6 +173,7 @@ class CurlHttpProxyProvider implements ProxyProviderInterface, SingletonInterfac
         if (!$this->logger) {
             $this->logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
         }
+
         return $this->logger;
     }
 }

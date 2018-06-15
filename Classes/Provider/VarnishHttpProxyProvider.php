@@ -1,5 +1,6 @@
 <?php
-declare(strict_types=1);
+
+declare(strict_types = 1);
 
 namespace B13\Proxycachemanager\Provider;
 
@@ -18,13 +19,12 @@ namespace B13\Proxycachemanager\Provider;
 
 /**
  * can use some varnish specific calls
- * todo: add what is needed for varnish
+ * todo: add what is needed for varnish.
  */
 class VarnishHttpProxyProvider extends CurlHttpProxyProvider
 {
-
     /**
-     * flushes the whole proxy cache (directly)
+     * flushes the whole proxy cache (directly).
      *
      * @param array $urls
      */

@@ -1,5 +1,6 @@
 <?php
-declare(strict_types=1);
+
+declare(strict_types = 1);
 
 namespace B13\Proxycachemanager\Cache\Backend;
 
@@ -24,7 +25,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * behaves like the Typo3DatabaseBackend and stores frontend URLs of pages in a database
  * when removing or flushing, additionally does a HTTP Request
- * of course "setting" works naturally in am already working reverse proxy environment
+ * of course "setting" works naturally in am already working reverse proxy environment.
  */
 class ReverseProxyCacheBackend extends Typo3DatabaseBackend
 {
@@ -34,7 +35,7 @@ class ReverseProxyCacheBackend extends Typo3DatabaseBackend
     protected $reverseProxyProvider;
 
     /**
-     * set from the AbstractCacheBackend when the object is instantiated
+     * set from the AbstractCacheBackend when the object is instantiated.
      *
      * @param string $className
      */
@@ -42,19 +43,20 @@ class ReverseProxyCacheBackend extends Typo3DatabaseBackend
     {
         if (empty($className)) {
             throw new \InvalidArgumentException('Invalid cache proxy provider for Reverse Proxy Cache', 1231267264);
-        } else {
-            try {
-                $this->reverseProxyProvider = GeneralUtility::makeInstance($className);
-            } catch (\Exception $e) {
-                throw new \InvalidArgumentException('Invalid cache proxy provider class for Reverse Proxy Cache - Class "' . $className . '" not found.',
-                    1231267264);
-            }
+        }
+        try {
+            $this->reverseProxyProvider = GeneralUtility::makeInstance($className);
+        } catch (\Exception $e) {
+            throw new \InvalidArgumentException(
+                    'Invalid cache proxy provider class for Reverse Proxy Cache - Class "' . $className . '" not found.',
+                    1231267264
+                );
         }
     }
 
     /**
      * set the hostnames of the reverse proxies
-     * set from the AbstractCacheBackend when the object is instantiated
+     * set from the AbstractCacheBackend when the object is instantiated.
      *
      * @param string $endpoints
      */
@@ -73,11 +75,11 @@ class ReverseProxyCacheBackend extends Typo3DatabaseBackend
      * Usually this only affects one entry.
      *
      * @param string $entryIdentifier Specifies the cache entry to remove
-     * @return boolean TRUE if (at least) an entry could be removed or FALSE if no entry was found
+     *
+     * @return bool TRUE if (at least) an entry could be removed or FALSE if no entry was found
      */
     public function remove($entryIdentifier)
     {
-
         // call the provider to forget this URL
         $url = $this->get($entryIdentifier);
         if ($url) {
@@ -89,9 +91,7 @@ class ReverseProxyCacheBackend extends Typo3DatabaseBackend
 
     /**
      * Removes all cache entries of this cache.
-     * Also let the proxy provider know to clear everything as well
-     *
-     * @return void
+     * Also let the proxy provider know to clear everything as well.
      */
     public function flush()
     {
@@ -106,7 +106,6 @@ class ReverseProxyCacheBackend extends Typo3DatabaseBackend
      * Removes all cache entries of this cache which are tagged by the specified tag.
      *
      * @param string $tag The tag the entries must have
-     * @return void
      */
     public function flushByTag($tag)
     {
@@ -122,7 +121,7 @@ class ReverseProxyCacheBackend extends Typo3DatabaseBackend
     }
 
     /**
-     * Fetch all URLs in the cache
+     * Fetch all URLs in the cache.
      */
     public function getAllCachedUrls()
     {
@@ -139,6 +138,7 @@ class ReverseProxyCacheBackend extends Typo3DatabaseBackend
                 $urls[] = $url;
             }
         }
+
         return $urls;
     }
 }

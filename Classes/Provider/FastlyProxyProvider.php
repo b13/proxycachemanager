@@ -1,5 +1,6 @@
 <?php
-declare(strict_types=1);
+
+declare(strict_types = 1);
 
 namespace B13\Proxycachemanager\Provider;
 
@@ -26,7 +27,7 @@ class FastlyProxyProvider implements ProxyProviderInterface
     protected $baseUrl = 'https://api.fastly.com/service/{serviceId}/';
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setProxyEndpoints($endpoints)
     {
@@ -34,7 +35,7 @@ class FastlyProxyProvider implements ProxyProviderInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function flushCacheForUrl($url)
     {
@@ -45,10 +46,9 @@ class FastlyProxyProvider implements ProxyProviderInterface
     }
 
     /**
-     * Flushes the whole proxy cache
+     * Flushes the whole proxy cache.
      *
      * @param array $urls
-     * @return void
      */
     public function flushAllUrls($urls = [])
     {
@@ -63,7 +63,7 @@ class FastlyProxyProvider implements ProxyProviderInterface
      */
     protected function isActive()
     {
-        return (!empty(getenv('FASTLY_SERVICE_ID')));
+        return !empty(getenv('FASTLY_SERVICE_ID'));
     }
 
     /**
@@ -77,6 +77,7 @@ class FastlyProxyProvider implements ProxyProviderInterface
     /**
      * @param $serviceId
      * @param $apiToken
+     *
      * @return Client
      */
     protected function initializeClient($serviceId, $apiToken)
@@ -88,5 +89,4 @@ class FastlyProxyProvider implements ProxyProviderInterface
 
         return new Client($httpOptions);
     }
-
 }

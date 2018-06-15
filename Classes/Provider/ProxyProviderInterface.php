@@ -1,5 +1,6 @@
 <?php
-declare(strict_types=1);
+
+declare(strict_types = 1);
 
 namespace B13\Proxycachemanager\Provider;
 
@@ -17,29 +18,28 @@ namespace B13\Proxycachemanager\Provider;
  */
 
 /**
- * The interface to be called from the CacheBackend
+ * The interface to be called from the CacheBackend.
  */
 interface ProxyProviderInterface
 {
     /**
-     * Sets the proxy endpoints
+     * Sets the proxy endpoints.
      *
      * @param array $endpoints
      */
     public function setProxyEndpoints($endpoints);
 
     /**
-     * flushes the proxy cache for a single URL
+     * flushes the proxy cache for a single URL.
      *
      * @param string $url
      */
     public function flushCacheForUrl($url);
 
     /**
-     * Flushes the whole proxy cache
+     * Flushes the whole proxy cache.
      *
      * @param array $urls
-     * @return void
      */
     public function flushAllUrls($urls = []);
 }
