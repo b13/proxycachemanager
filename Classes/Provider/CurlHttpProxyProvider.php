@@ -1,164 +1,176 @@
 <?php
+declare(strict_types=1);
 
 namespace B13\Proxycachemanager\Provider;
 
-/***************************************************************
- *  Copyright notice - MIT License (MIT)
+/*
+ * This file is part of the b13 TYPO3 extensions family.
  *
- *  (c) 2014 Benjamin Mack <benni@typo3.org>
- *  All rights reserved
+ * It is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License, either version 2
+ * of the License, or any later version.
  *
- *  Permission is hereby granted, free of charge, to any person obtaining a copy
- *  of this software and associated documentation files (the "Software"), to deal
- *  in the Software without restriction, including without limitation the rights
- *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- *  copies of the Software, and to permit persons to whom the Software is
- *  furnished to do so, subject to the following conditions:
+ * For the full copyright and license information, please read the
+ * LICENSE.txt file that was distributed with this source code.
  *
- *  The above copyright notice and this permission notice shall be included in
- *  all copies or substantial portions of the Software.
- *
- *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- *  THE SOFTWARE.
- ***************************************************************/
+ * The TYPO3 project - inspiring people to share!
+ */
+
+use TYPO3\CMS\Core\Log\Logger;
+use TYPO3\CMS\Core\Log\LogManager;
+use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
- * behaves like the Typo3DatabaseBackend and stores frontend URLs of pages in a database
- * when removing or flushing, additionally does a HTTP Request
- * of course "setting" works naturally in am already working reverse proxy environment
- *
- * @package B13\Proxycachemanager\Provider
+ * Works with a queue directly with CURL.
+ * Using guzzle here is the next step.
  */
-class CurlHttpProxyProvider implements ProxyProviderInterface, \TYPO3\CMS\Core\SingletonInterface {
+class CurlHttpProxyProvider implements ProxyProviderInterface, SingletonInterface
+{
 
-	/**
-	 * a queue so that within one request, the flush request is only done once (see executeCacheFlush())
-	 *
-	 * @var array
-	 */
-	protected $queue = array();
+    /**
+     * a queue so that within one request, the flush request is only done once (see executeCacheFlush())
+     *
+     * @var array
+     */
+    protected $queue = [];
 
-	/**
-	 * a list of URLs of the proxy endpoints to be called
-	 * @var array
-	 */
-	protected $proxyEndpoints = array();
+    /**
+     * a list of URLs of the proxy endpoints to be called
+     * @var array
+     */
+    protected $proxyEndpoints = [];
 
-	/**
-	 * sets the proxy endpoints
-	 * @param $endpoints
-	 */
-	public function setProxyEndpoints($endpoints) {
-		$this->proxyEndpoints = $endpoints;
-	}
+    /**
+     * @var Logger
+     */
+    protected $logger;
 
-	/**
-	 * flushes the proxy cache for a single URL
-	 */
-	public function flushCacheForUrl($url) {
-		$this->queue[] = $url;
-	}
+    /**
+     * @inheritdoc
+     */
+    public function setProxyEndpoints($endpoints)
+    {
+        $this->proxyEndpoints = $endpoints;
+    }
 
-	/**
-	 * flushes all proxy cache URLs
-	 */
-	public function flushAllUrls($urls = array()) {
-		// SQL query to fetch all URLs
-		$this->queue = $urls;
-		$this->executeCacheFlush();
-	}
+    /**
+     * @inheritdoc
+     */
+    public function flushCacheForUrl($url)
+    {
+        $this->queue[] = $url;
+    }
 
-	/**
-	 * calls the reverse proxy via a URL cache
-	 * @return void
-	 */
-	protected function executeCacheFlush() {
-		if (count($this->queue) > 0) {
-			$this->queue = array_unique($this->queue);
+    /**
+     * @inheritdoc
+     */
+    public function flushAllUrls($urls = [])
+    {
+        // SQL query to fetch all URLs
+        $this->queue = $urls;
+        $this->executeCacheFlush();
+    }
 
-			$curlQueueHandler = curl_multi_init();
-			$curlHandles = array();
+    /**
+     * calls the reverse proxy via a URL cache
+     * @return void
+     */
+    protected function executeCacheFlush()
+    {
+        if (!empty($this->queue)) {
+            $this->queue = array_unique($this->queue);
 
-			foreach ($this->queue as $urlToFlush) {
-				foreach ($this->proxyEndpoints as $proxyEndpoint) {
-					$curlHandle = $this->getCurlHandleForPurgeHttpRequest($urlToFlush, $proxyEndpoint);
-					$curlHandles[] = $curlHandle;
-					curl_multi_add_handle($curlQueueHandler, $curlHandle);
-				}
-			}
+            $curlQueueHandler = curl_multi_init();
+            $curlHandles = array();
 
-			$active = NULL;
-			do {
-				$multiExecResult = curl_multi_exec($curlQueueHandler, $active);
-			} while ($multiExecResult == CURLM_CALL_MULTI_PERFORM);
+            foreach ($this->queue as $urlToFlush) {
+                foreach ($this->proxyEndpoints as $proxyEndpoint) {
+                    $curlHandle = $this->getCurlHandleForPurgeHttpRequest($urlToFlush, $proxyEndpoint);
+                    $curlHandles[] = $curlHandle;
+                    curl_multi_add_handle($curlQueueHandler, $curlHandle);
+                }
+            }
 
-			while ($active && $multiExecResult == CURLM_OK) {
-				if (curl_multi_select($curlQueueHandler) != -1) {
-					do {
-						$multiExecResult = curl_multi_exec($curlQueueHandler, $active);
-					} while ($multiExecResult == CURLM_CALL_MULTI_PERFORM);
-				}
-			}
+            $active = null;
+            do {
+                $multiExecResult = curl_multi_exec($curlQueueHandler, $active);
+            } while ($multiExecResult == CURLM_CALL_MULTI_PERFORM);
 
-			foreach ($curlHandles as $curlHandle) {
-				curl_multi_remove_handle($curlQueueHandler, $curlHandle);
-			}
+            while ($active && $multiExecResult == CURLM_OK) {
+                if (curl_multi_select($curlQueueHandler) != -1) {
+                    do {
+                        $multiExecResult = curl_multi_exec($curlQueueHandler, $active);
+                    } while ($multiExecResult == CURLM_CALL_MULTI_PERFORM);
+                }
+            }
 
-			curl_multi_close($curlQueueHandler);
-			// and empty the URL queue again
-			$this->queue = array();
-		}
-	}
+            foreach ($curlHandles as $curlHandle) {
+                curl_multi_remove_handle($curlQueueHandler, $curlHandle);
+            }
 
-	/**
-	 * instantiates a curl handle in order to call
-	 * @param string $urlToPurge The URL that should be cleared
-	 * @param string $endpointUrl the URL of the proxy server that deals with the purging
-	 * @return resource
-	 */
-	protected function getCurlHandleForPurgeHttpRequest($urlToPurge, $endpointUrl) {
-		$urlParts = parse_url($urlToPurge);
-		$finalEndpointUrl = str_replace(
-			array('{scheme}', '{host}', '{port}', '{user}', '{pass}', '{path}', '{query}', '{fragment}', '{url}'),
-			array($urlParts['scheme'], $urlParts['host'], $urlParts['port'], $urlParts['user'], $urlParts['pass'], trim($urlParts['path'], '/'), $urlParts['query'], $urlParts['fragment'], $urlToPurge),
-			$endpointUrl
-		);
+            curl_multi_close($curlQueueHandler);
+            // and empty the URL queue again
+            $this->queue = [];
+        }
+    }
 
-		$this->getLogObject()->info(
-			'Purging "%s" on endpoint "%s"',
-			array($finalEndpointUrl, $urlToPurge)
-		);
+    /**
+     * Instantiates a curl handle in order to call
+     *
+     * @param string $urlToPurge The URL that should be cleared
+     * @param string $endpointUrl the URL of the proxy server that deals with the purging
+     * @return resource
+     */
+    protected function getCurlHandleForPurgeHttpRequest($urlToPurge, $endpointUrl)
+    {
+        $urlParts = parse_url($urlToPurge);
+        $finalEndpointUrl = str_replace(
+            array('{scheme}', '{host}', '{port}', '{user}', '{pass}', '{path}', '{query}', '{fragment}', '{url}'),
+            array(
+                $urlParts['scheme'],
+                $urlParts['host'],
+                $urlParts['port'],
+                $urlParts['user'],
+                $urlParts['pass'],
+                trim($urlParts['path'], '/'),
+                $urlParts['query'],
+                $urlParts['fragment'],
+                $urlToPurge
+            ),
+            $endpointUrl
+        );
 
-		$curlHandle = curl_init($finalEndpointUrl);
-		curl_setopt($curlHandle, CURLOPT_CUSTOMREQUEST, 'PURGE');
-		curl_setopt($curlHandle, CURLOPT_HEADER, 0);
-		curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($curlHandle, CURLOPT_SSL_VERIFYPEER, 0);
-		curl_setopt($curlHandle, CURLOPT_SSL_VERIFYHOST, 0);
-		return $curlHandle;
-	}
+        $this->getLogger()->info(
+            'Purging "%s" on endpoint "%s"',
+            [$finalEndpointUrl, $urlToPurge]
+        );
 
-	/**
-	 * call the execution of the HTTP requests (queue worker)
-	 */
-	public function __destruct() {
-		$this->executeCacheFlush();
-	}
+        $curlHandle = curl_init($finalEndpointUrl);
+        curl_setopt($curlHandle, CURLOPT_CUSTOMREQUEST, 'PURGE');
+        curl_setopt($curlHandle, CURLOPT_HEADER, 0);
+        curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curlHandle, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($curlHandle, CURLOPT_SSL_VERIFYHOST, 0);
+        return $curlHandle;
+    }
 
-	/**
-	 * return \TYPO3\CMS\Core\Log\Logger
-	 */
-	protected function getLogObject() {
-		static $logObject;
-		if (!$logObject) {
-			$logObject = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\CMS\Core\Log\LogManager')->getLogger(__CLASS__);
-		}
-		return $logObject;
-	}
+    /**
+     * call the execution of the HTTP requests (queue worker)
+     */
+    public function __destruct()
+    {
+        $this->executeCacheFlush();
+    }
 
+    /**
+     * @return Logger
+     */
+    protected function getLogger()
+    {
+        if (!$this->logger) {
+            $this->logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
+        }
+        return $this->logger;
+    }
 }

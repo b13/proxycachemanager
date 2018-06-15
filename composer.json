@@ -1,0 +1,39 @@
+{
+	"name": "b13/proxycachemanager",
+	"description": "TYPO3 Extension that automatically flushes cached URLs within a proxy / CDN.",
+	"keywords": ["typo3", "cdn", "varnish", "cache", "purge", "proxy"],
+	"homepage": "https://www.b13.de/",
+	"type": "typo3-cms-extension",
+	"license": "GPL-2.0-or-later",
+	"authors": [
+		{
+			"name": "Benni Mack",
+			"role": "Maintainer"
+		}
+	],
+	"support": {
+		"general": "https://github.com/b13/t3ext-proxycachemanager/",
+		"issues": "https://github.com/b13/t3ext-proxycachemanager/issues/"
+	},
+	"config": {
+		"sort-packages": true
+	},
+    "require": {
+        "php": "^7.0",
+        "guzzlehttp/guzzle": "^6.0",
+        "typo3/cms-core": "^7.6 || ^8.7 || ^9.0"
+    },
+	"replace": {
+		"proxycachemanager": "*"
+	},
+	"extra": {
+		"typo3/cms": {
+			"extension-key": "proxycachemanager"
+		}
+	},
+	"autoload": {
+		"psr-4": {
+			"B13\\Proxycachemanager\\": "Classes/"
+		}
+	}
+}

@@ -8,15 +8,13 @@ $EM_CONF[$_EXTKEY] = array(
 	'loadOrder' => '',
 	'module' => '',
 	'state' => 'stable',
-	'uploadfolder' => 0,
 	'clearcacheonload' => 1,
-	'lockType' => '',
 	'author' => 'Benjamin Mack',
 	'author_email' => 'benni@typo3.org',
 	'author_company' => 'b:dreizehn GmbH',
 	'constraints' => array(
 		'depends' => array(
-			'typo3' => '6.0.0-6.2.99'
+			'typo3' => '7.0.0-9.9.99'
 		),
 		'conflicts' => array(
 		),
@@ -27,4 +25,3 @@ $EM_CONF[$_EXTKEY] = array(
 	'_md5_values_when_last_written' => '',
 );
 
-?>

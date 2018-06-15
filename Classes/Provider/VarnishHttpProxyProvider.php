@@ -1,45 +1,36 @@
 <?php
+declare(strict_types=1);
 
 namespace B13\Proxycachemanager\Provider;
 
-/***************************************************************
- *  Copyright notice - MIT License (MIT)
+/*
+ * This file is part of the b13 TYPO3 extensions family.
  *
- *  (c) 2014 Benjamin Mack <benni@typo3.org>
- *  All rights reserved
+ * It is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License, either version 2
+ * of the License, or any later version.
  *
- *  Permission is hereby granted, free of charge, to any person obtaining a copy
- *  of this software and associated documentation files (the "Software"), to deal
- *  in the Software without restriction, including without limitation the rights
- *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- *  copies of the Software, and to permit persons to whom the Software is
- *  furnished to do so, subject to the following conditions:
+ * For the full copyright and license information, please read the
+ * LICENSE.txt file that was distributed with this source code.
  *
- *  The above copyright notice and this permission notice shall be included in
- *  all copies or substantial portions of the Software.
- *
- *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- *  THE SOFTWARE.
- ***************************************************************/
+ * The TYPO3 project - inspiring people to share!
+ */
 
 /**
  * can use some varnish specific calls
  * todo: add what is needed for varnish
- *
- * @package B13\Proxycachemanager\Provider
  */
-class VarnishHttpProxyProvider extends CurlHttpProxyProvider {
+class VarnishHttpProxyProvider extends CurlHttpProxyProvider
+{
 
-	/**
-	 * flushes the whole proxy cache (directly)
-	 */
-	public function flushAllUrls($urls = array()) {
-		$this->queue = array('.*');
-		$this->executeCacheFlush();
-	}
+    /**
+     * flushes the whole proxy cache (directly)
+     *
+     * @param array $urls
+     */
+    public function flushAllUrls($urls = [])
+    {
+        $this->queue = ['.*'];
+        $this->executeCacheFlush();
+    }
 }
