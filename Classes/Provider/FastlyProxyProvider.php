@@ -42,7 +42,7 @@ class FastlyProxyProvider implements ProxyProviderInterface
         if (!$this->isActive()) {
             return;
         }
-        $this->getClient()->request('PURGE', $url);
+        $this->getClient()->request('PURGE', $url, ['verify' => false]);
     }
 
     /**
