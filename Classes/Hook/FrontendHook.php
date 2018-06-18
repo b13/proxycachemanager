@@ -62,8 +62,21 @@ class FrontendHook
             );
 
             foreach ($parentObject->imagesOnPage as $imageUrl) {
+                // Only cache local files
+                $hasSchema = parse_url($imageUrl, PHP_URL_SCHEME);
+                if (!empty($hasSchema)) {
+                    continue;
+                }
                 $url = GeneralUtility::getIndpEnv('TYPO3_SITE_URL') . $imageUrl;
-                $cache->set(md5($url), $url, ['pageId_' . $pageUid]);
+                // If it's not from an extension, clear the cache
+                // Extension files are not changed, only during deployment, where we expect that all caches
+                // Are flushed
+                if (strpos($imageUrl, 'typo3conf/ext/') !== false) {
+                    $tags = ['pageId_' . $pageUid];
+                } else {
+                    $tags = [];
+                }
+                $cache->set(md5($url), $url, $tags);
                 $this->getLogger()->info(
                     'Marking image "%s" (on page %s) as cached.',
                     [$url, $pageUid]
