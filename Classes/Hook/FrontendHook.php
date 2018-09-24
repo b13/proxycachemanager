@@ -67,15 +67,18 @@ class FrontendHook
                 if (!empty($hasSchema)) {
                     continue;
                 }
-                $url = GeneralUtility::getIndpEnv('TYPO3_SITE_URL') . $imageUrl;
                 // If it's not from an extension, clear the cache
                 // Extension files are not changed, only during deployment, where we expect that all caches
                 // Are flushed
                 if (strpos($imageUrl, 'typo3conf/ext/') !== false) {
-                    $tags = ['pageId_' . $pageUid];
-                } else {
-                    $tags = [];
+                    continue;
                 }
+                // processed images are not cached either
+                if (strpos($imageUrl, '/_processed_') !== false) {
+                    continue;
+                }
+                $url = GeneralUtility::getIndpEnv('TYPO3_SITE_URL') . $imageUrl;
+                $tags = ['pageId_' . $pageUid];
                 $cache->set(md5($url), $url, $tags);
                 $this->getLogger()->info(
                     'Marking image "%s" (on page %s) as cached.',
