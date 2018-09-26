@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.0" xmlns:t3="http://typo3.org/schemas/xliff">
+	<file t3:id="1537971722" source-language="en" datatype="plaintext" original="messages" date="2018-09-17T20:22:33Z" product-name="proxycachemanager">
+		<header/>
+		<body>
+			<trans-unit id="menuitem.title">
+				<source>Flush CDN cache</source>
+			</trans-unit>
+			<trans-unit id="menuitem.description">
+				<source>Purge all URLs in CDNs</source>
+			</trans-unit>
+			<trans-unit id="purge.success">
+				<source>CDN is fresh again</source>
+			</trans-unit>
+			<trans-unit id="purge.failure">
+				<source>There was a problem flushing the caches. No CDN configured?</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

@@ -19,3 +19,5 @@ if (empty($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['
 }
 // Hook for adding any cacheable frontend URL to our proxy cache
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['tslib/class.tslib_fe.php']['contentPostProc-cached']['tx_proxycachemanager'] = \B13\Proxycachemanager\Hook\FrontendHook::class . '->addCacheableUrlToProxyCache';
+// Hook for adding an additional cache clearing button
+$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['additionalBackendItems']['cacheActions']['tx_proxycachemanager'] = \B13\Proxycachemanager\Controller\CacheController::class;
