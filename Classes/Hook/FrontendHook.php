@@ -17,12 +17,12 @@ namespace B13\Proxycachemanager\Hook;
  * The TYPO3 project - inspiring people to share!
  */
 
+use B13\Proxycachemanager\Controller\TypoScriptFrontendController;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException;
 use TYPO3\CMS\Core\Log\Logger;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 /**
  * Class containing frontend-related hooks.
@@ -55,7 +55,7 @@ class FrontendHook
 
             // cache the page URL that was called
             $url = GeneralUtility::getIndpEnv('TYPO3_REQUEST_URL');
-            $cache->set(md5($url), $url, ['pageId_' . $pageUid]);
+            $cache->set(md5($url), $url, $parentObject->getPageCacheTags());
             $this->getLogger()->info(
                 'Marking page "%s" (uid %s) as cached.',
                 [$url, $pageUid]
@@ -78,8 +78,7 @@ class FrontendHook
                     continue;
                 }
                 $url = GeneralUtility::getIndpEnv('TYPO3_SITE_URL') . $imageUrl;
-                $tags = ['pageId_' . $pageUid];
-                $cache->set(md5($url), $url, $tags);
+                $cache->set(md5($url), $url, $parentObject->getPageCacheTags());
                 $this->getLogger()->info(
                     'Marking image "%s" (on page %s) as cached.',
                     [$url, $pageUid]
