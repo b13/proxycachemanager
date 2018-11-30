@@ -25,7 +25,7 @@ $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['tslib/class.tslib_fe.php']['contentPo
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['additionalBackendItems']['cacheActions']['tx_proxycachemanager'] =
     \B13\Proxycachemanager\Controller\CacheController::class;
 
-// XCLASS to add a
+// XCLASS to add a getter for pageCacheTags in TSFE
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][\TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController::class] = [
     'className' => \B13\Proxycachemanager\Controller\TypoScriptFrontendController::class
 ];
