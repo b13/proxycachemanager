@@ -130,6 +130,30 @@ class ReverseProxyCacheBackend extends Typo3DatabaseBackend
     }
 
     /**
+     * Removes all entries tagged by any of the specified tags.
+     *
+     * @param string[] $tags
+     */
+    public function flushByTags(array $tags)
+    {
+        $identifiers = [];
+        foreach($tags as $tag) {
+            $identifiers = array_merge($identifiers, $this->findIdentifiersByTag($tag));
+        }
+        $identifiers = array_unique($identifiers);
+
+        $urls = [];
+        foreach($identifiers as $entryIdentifier) {
+            $urls[] = $this->get($entryIdentifier);
+        }
+        $urls = array_unique($urls);
+
+        $this->reverseProxyProvider->flushCacheForUrls($urls);
+
+        parent::flushByTags($tags);
+    }
+
+    /**
      * Fetch all URLs in the cache.
      */
     public function getAllCachedUrls()

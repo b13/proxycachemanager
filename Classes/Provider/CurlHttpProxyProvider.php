@@ -66,11 +66,18 @@ class CurlHttpProxyProvider implements ProxyProviderInterface, SingletonInterfac
     /**
      * {@inheritdoc}
      */
-    public function flushAllUrls($urls = [])
+    public function flushCacheForUrls($urls = [])
     {
-        // SQL query to fetch all URLs
         $this->queue = $urls;
         $this->executeCacheFlush();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function flushAllUrls($urls = [])
+    {
+        $this->flushCacheForUrls($urls);
     }
 
     /**
