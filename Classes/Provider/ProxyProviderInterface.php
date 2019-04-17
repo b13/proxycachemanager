@@ -37,6 +37,13 @@ interface ProxyProviderInterface
     public function flushCacheForUrl($url);
 
     /**
+     * Flushes multiple urls from the proxy cache
+     *
+     * @param array $urls
+     */
+    public function flushCacheForUrls(array $urls);
+
+    /**
      * Flushes the whole proxy cache.
      *
      * @param array $urls

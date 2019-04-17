@@ -46,6 +46,16 @@ class FastlyProxyProvider implements ProxyProviderInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function flushCacheForUrls(array $urls)
+    {
+        foreach ($urls as $url) {
+            $this->flushCacheForUrl($url);
+        }
+    }
+
+    /**
      * Flushes the whole proxy cache.
      *
      * @param array $urls
