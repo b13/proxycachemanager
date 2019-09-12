@@ -6,7 +6,7 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['tx_proxycachemanager'] = unserialize($GL
 
 if (empty($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['tx_proxy'])) {
     $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['tx_proxy'] = [
-        'frontend' => \TYPO3\CMS\Core\Cache\Frontend\StringFrontend::class,
+        'frontend' => \TYPO3\CMS\Core\Cache\Frontend\VariableFrontend::class,
         'backend' => \B13\Proxycachemanager\Cache\Backend\ReverseProxyCacheBackend::class,
         'options' => [
             'defaultLifetime' => 0, // @todo: should be not "infinite" but rather set to whatever the proxy settings are
