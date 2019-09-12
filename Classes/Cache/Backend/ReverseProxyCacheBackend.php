@@ -159,19 +159,11 @@ class ReverseProxyCacheBackend extends Typo3DatabaseBackend
     public function getAllCachedUrls()
     {
         $urls = [];
-        if (is_object($GLOBALS['TYPO3_DB'])) {
-            $records = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows('content', $this->cacheTable, '', '', '', '', 'content');
-            if (is_array($records)) {
-                $urls = array_keys($records);
-            }
-        } else {
-            $conn = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable($this->cacheTable);
-            $stmt = $conn->select(['content'], $this->cacheTable);
-            while ($url = $stmt->fetchColumn(0)) {
-                $urls[] = $url;
-            }
+        $conn = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable($this->cacheTable);
+        $stmt = $conn->select(['content'], $this->cacheTable);
+        while ($url = $stmt->fetchColumn(0)) {
+            $urls[] = $url;
         }
-
         return $urls;
     }
 }
