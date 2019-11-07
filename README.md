@@ -48,11 +48,18 @@ Ensure to set the environment variables `FASTLY_SERVICE_ID` and `FASTLY_API_TOKE
 Cloudflare v4 API is used to make HTTP requests via Guzzle HTTP and API Tokens. This is done by firing HTTP POST
 requests to purge one, multiple or all requests on a domain.
 
-Ensure to set the environment variables `CLOUDFLARE_ZONE_ID` and `CLOUDFLARE_API_TOKEN`.
+Ensure to set the environment variable `CLOUDFLARE_API_TOKEN` in place.
+
+#### Configuration
+
+Add this to your `AdditionalConfiguration.php` file:
+
+    $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['proxycachemanager']['cloudflare']['zones'] = [
+        'example.com' => 'MY_ZONE_ID'
+    ];
 
 #### Limitations
  - Only API Token authentication is available
- - It is only possible to use one zone for one installation currently
  - It is not possible to flush by tag (Enterprise Only)
 
 Credits

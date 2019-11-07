@@ -24,8 +24,13 @@ use GuzzleHttp\Client;
  * API Tokens are generated from the User Profile 'API Tokens' page https://dash.cloudflare.com/profile/api-tokens.
  * Get your Zone ID via Dash in your Zone on the right-side menu.
  *
- * Please note that the ProxyProvider only works for one Zone (= one domain) currently, however, this would need
- * to be mapped on a per-domain basis.
+ * Ensure to set the environment variable CLOUDFLARE_API_TOKEN.
+ *
+ * Please note that the ProxyProvider needs additional configuration for each zone in
+ *
+ * $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['proxycachemanager']['cloudflare']['zones'] = [
+ *  'example.com' => 'ZONE_ID'
+ * ];
  */
 class CloudflareProxyProvider implements ProxyProviderInterface
 {
@@ -34,7 +39,10 @@ class CloudflareProxyProvider implements ProxyProviderInterface
      */
     protected $baseUrl = 'https://api.cloudflare.com/client/v4/zones/{zoneId}/';
 
-    protected $client;
+    /**
+     * @var Client[]
+     */
+    protected $clients;
 
     /**
      * @inheritDoc
@@ -52,7 +60,10 @@ class CloudflareProxyProvider implements ProxyProviderInterface
         if (!$this->isActive()) {
             return;
         }
-        $this->getClient()->post('purge_cache', ['files' => [$url]]);
+        $groupedUrls = $this->groupUrlsByAllowedZones([$url]);
+        foreach ($groupedUrls as $zoneId => $urls) {
+            $this->getClient($zoneId)->post('purge_cache', ['files' => $urls]);
+        }
     }
 
     /**
@@ -64,9 +75,15 @@ class CloudflareProxyProvider implements ProxyProviderInterface
             return;
         }
         if (empty($urls)) {
-            $this->getClient()->post('purge_cache', ['purge_everything' => true]);
+            foreach ($this->getZones() as $domain => $zoneId) {
+                $this->getClient($zoneId)->post('purge_cache', ['purge_everything' => true]);
+            }
         } else {
-            $this->getClient()->post('purge_cache', ['files' => $urls]);
+            $groupedUrls = $this->groupUrlsByAllowedZones($urls);
+
+            foreach ($groupedUrls as $zoneId => $urls) {
+                $this->purgeInChunks($zoneId, $urls);
+            }
         }
     }
 
@@ -78,7 +95,27 @@ class CloudflareProxyProvider implements ProxyProviderInterface
         if (!$this->isActive()) {
             return;
         }
-        $this->getClient()->post('purge_cache', ['files' => $urls]);
+
+        $groupedUrls = $this->groupUrlsByAllowedZones($urls);
+        foreach ($groupedUrls as $zoneId => $urls) {
+            $this->purgeInChunks($zoneId, $urls);
+        }
+    }
+
+    /**
+     * Cloudflare only allows to purge 30 urls per request, so we chunk this.
+     *
+     * @param string $zoneId
+     * @param array $urls
+     * @param int $chunkSize
+     */
+    protected function purgeInChunks(string $zoneId, array $urls, int $chunkSize = 30): void
+    {
+        $client = $this->getClient($zoneId);
+        $urlGroups = array_chunk($urls, $chunkSize);
+        foreach ($urlGroups as $urlGroup) {
+            $client->post('purge_cache', ['files' => $urlGroup]);
+        }
     }
 
     /**
@@ -90,14 +127,15 @@ class CloudflareProxyProvider implements ProxyProviderInterface
     }
 
     /**
+     * @param string $zoneId
      * @return Client
      */
-    protected function getClient()
+    protected function getClient(string $zoneId): Client
     {
-        if (!$this->client) {
-            $this->client = $this->initializeClient(getenv('CLOUDFLARE_ZONE_ID'), getenv('CLOUDFLARE_API_TOKEN'));
+        if (!$this->clients[$zoneId]) {
+            $this->clients[$zoneId] = $this->initializeClient($zoneId, getenv('CLOUDFLARE_API_TOKEN'));
         }
-        return $this->client;
+        return $this->clients[$zoneId];
     }
 
     /**
@@ -115,4 +153,33 @@ class CloudflareProxyProvider implements ProxyProviderInterface
         return new Client($httpOptions);
     }
 
+    /**
+     * A URL could look like www-intranet.example.com but the zone would be example.com in this case,
+     * this is filtered and grouped.
+     *
+     * @param array $urls
+     * @return array
+     */
+    protected function groupUrlsByAllowedZones(array $urls): array
+    {
+        $groupedUrls = [];
+        $availableZones = $this->getZones();
+        foreach ($availableZones as $domain => $zoneId) {
+            $groupedUrls[$zoneId] = array_filter($urls, function($url) use ($domain) {
+                $urlParts = [];
+                parse_str($url, $urlParts);
+                $domainOfUrl = $urlParts['host'];
+                if (stripos('.' . $domainOfUrl, '.' . $domain) !== false) {
+                    return true;
+                }
+                return false;
+            });
+        }
+        return $groupedUrls;
+    }
+
+    protected function getZones(): array
+    {
+        return $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['proxycachemanager']['cloudflare']['zones'] ?? [];
+    }
 }
