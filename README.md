@@ -21,13 +21,13 @@ on his/her website.
 
 Requirements
 ------------
- * A TYPO3 setup (7 LTS+) with cacheable content, see the "cacheinfo" extension for what can be tracked with HTTP caches.
+ * A TYPO3 setup (v9 LTS+) with cacheable content, see the "cacheinfo" extension for what can be tracked with HTTP caches.
  * Either nginx or varnish configured to proxy the TYPO3 system. For nginx, make sure that nginx is compiled to allow
- to flush caches via HTTP `PURGE`.
+ to flush caches via HTTP `PURGE`. Alternatively, use a CDN like Fastly or Cloudflare for playing around with it.
 
 Setup
 -----
-Install the extension and make sure to enter the detail about your proxy servers, otherwise the default (`IENV:TYPO3_REV_PROXY`) is used.
+Install the extension and make sure to enter the details about your proxy servers, otherwise the default (`IENV:TYPO3_REV_PROXY`) is used.
 
 Don't forget to set the according TYPO3 settings for using proxies, see `$GLOBALS['TYPO3_CONF_VARS']['SYS']['reverseProxyIP']` and `$GLOBALS['TYPO3_CONF_VARS']['SYS']['reverseProxyHeaderMultiValue']`.
 
@@ -48,11 +48,18 @@ Ensure to set the environment variables `FASTLY_SERVICE_ID` and `FASTLY_API_TOKE
 Cloudflare v4 API is used to make HTTP requests via Guzzle HTTP and API Tokens. This is done by firing HTTP POST
 requests to purge one, multiple or all requests on a domain.
 
-Ensure to set the environment variables `CLOUDFLARE_ZONE_ID` and `CLOUDFLARE_API_TOKEN`.
+Ensure to set the environment variable `CLOUDFLARE_API_TOKEN` in place.
+
+#### Configuration
+
+Add this to your `AdditionalConfiguration.php` file:
+
+    $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['proxycachemanager']['cloudflare']['zones'] = [
+        'example.com' => 'MY_ZONE_ID'
+    ];
 
 #### Limitations
  - Only API Token authentication is available
- - It is only possible to use one zone for one installation currently
  - It is not possible to flush by tag (Enterprise Only)
 
 Credits

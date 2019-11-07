@@ -1,7 +1,5 @@
 <?php
-
 declare(strict_types = 1);
-
 namespace B13\Proxycachemanager\Provider;
 
 /*
@@ -66,7 +64,7 @@ class CurlHttpProxyProvider implements ProxyProviderInterface, SingletonInterfac
     /**
      * {@inheritdoc}
      */
-    public function flushCacheForUrls($urls = [])
+    public function flushCacheForUrls(array $urls)
     {
         $this->queue = $urls;
         $this->executeCacheFlush();
