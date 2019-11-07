@@ -64,7 +64,7 @@ class CurlHttpProxyProvider implements ProxyProviderInterface, SingletonInterfac
     /**
      * {@inheritdoc}
      */
-    public function flushCacheForUrls($urls = [])
+    public function flushCacheForUrls(array $urls)
     {
         $this->queue = $urls;
         $this->executeCacheFlush();
