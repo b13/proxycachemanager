@@ -1,7 +1,5 @@
 <?php
-
 declare(strict_types = 1);
-
 namespace B13\Proxycachemanager\Hook;
 
 /*
@@ -17,34 +15,31 @@ namespace B13\Proxycachemanager\Hook;
  * The TYPO3 project - inspiring people to share!
  */
 
-use B13\Proxycachemanager\Controller\TypoScriptFrontendController;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException;
-use TYPO3\CMS\Core\Log\Logger;
-use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class containing frontend-related hooks.
  */
-class FrontendHook
+class FrontendHook implements LoggerAwareInterface
 {
-    /**
-     * @var Logger
-     */
-    protected $logger;
+    use LoggerAwareTrait;
 
     /**
-     * Hook that is called when a cacheable page is ready for output
+     * Hook that is called when a cacheable page was just added to the cache system
      * calls the proxy cache and stores the pageId, the URL
      * this call costs a little bit of performance but is only called
      * once (!) as the URL is cacheable, next time it is fetched
      * from the reverse proxy directly.
      *
-     * @param array                        $parameters
      * @param TypoScriptFrontendController $parentObject
+     * @param $timeOutTime
      */
-    public function addCacheableUrlToProxyCache($parameters, TypoScriptFrontendController $parentObject)
+    public function insertPageIncache(TypoScriptFrontendController $parentObject, $timeOutTime)
     {
         if (!$GLOBALS['TYPO3_CONF_VARS']['SYS']['reverseProxyIP']) {
              return;
@@ -56,7 +51,7 @@ class FrontendHook
             // cache the page URL that was called
             $url = GeneralUtility::getIndpEnv('TYPO3_REQUEST_URL');
             $cache->set(md5($url), $url, $parentObject->getPageCacheTags());
-            $this->getLogger()->info(
+            $this->logger->info(
                 'Marking page "%s" (uid %s) as cached.',
                 [$url, $pageUid]
             );
@@ -79,7 +74,7 @@ class FrontendHook
                 }
                 $url = GeneralUtility::getIndpEnv('TYPO3_SITE_URL') . $imageUrl;
                 $cache->set(md5($url), $url, $parentObject->getPageCacheTags());
-                $this->getLogger()->info(
+                $this->logger->info(
                     'Marking image "%s" (on page %s) as cached.',
                     [$url, $pageUid]
                 );
@@ -87,17 +82,5 @@ class FrontendHook
         } catch (NoSuchCacheException $e) {
             // No cache, nothing to do
         }
-    }
-
-    /**
-     * @return Logger
-     */
-    protected function getLogger()
-    {
-        if (!$this->logger) {
-            $this->logger = GeneralUtility::makeInstance(LogManager::class)->getLogger('b13.proxy.cache.populate');
-        }
-
-        return $this->logger;
     }
 }

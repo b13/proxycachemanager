@@ -19,13 +19,10 @@
 		"sort-packages": true
 	},
     "require": {
-        "php": "^7.0",
+        "php": "^7.2",
         "guzzlehttp/guzzle": "^6.0",
-        "typo3/cms-core": "^8.7 || ^9.0 || ^10.0"
+        "typo3/cms-core": "^9.0 || ^10.0"
     },
-	"replace": {
-		"proxycachemanager": "*"
-	},
 	"extra": {
 		"typo3/cms": {
 			"extension-key": "proxycachemanager"
