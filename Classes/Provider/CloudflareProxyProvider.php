@@ -62,7 +62,11 @@ class CloudflareProxyProvider implements ProxyProviderInterface
         }
         $groupedUrls = $this->groupUrlsByAllowedZones([$url]);
         foreach ($groupedUrls as $zoneId => $urls) {
-            $this->getClient($zoneId)->post('purge_cache', ['files' => $urls]);
+            if (empty($urls)) {
+                continue;
+            }
+            $data = ['json' => ['files' => array_values($urls)]];
+            $this->getClient($zoneId)->post('purge_cache', $data);
         }
     }
 
@@ -76,11 +80,10 @@ class CloudflareProxyProvider implements ProxyProviderInterface
         }
         if (empty($urls)) {
             foreach ($this->getZones() as $domain => $zoneId) {
-                $this->getClient($zoneId)->post('purge_cache', ['purge_everything' => true]);
+                $this->getClient($zoneId)->post('purge_cache', ['json' => ['purge_everything' => true]]);
             }
         } else {
             $groupedUrls = $this->groupUrlsByAllowedZones($urls);
-
             foreach ($groupedUrls as $zoneId => $urls) {
                 $this->purgeInChunks($zoneId, $urls);
             }
@@ -111,10 +114,15 @@ class CloudflareProxyProvider implements ProxyProviderInterface
      */
     protected function purgeInChunks(string $zoneId, array $urls, int $chunkSize = 30): void
     {
+        if (empty($urls)) {
+            return;
+        }
         $client = $this->getClient($zoneId);
         $urlGroups = array_chunk($urls, $chunkSize);
         foreach ($urlGroups as $urlGroup) {
-            $client->post('purge_cache', ['files' => $urlGroup]);
+            if (!empty($urlGroup)) {
+                $client->post('purge_cache', ['json' => ['files' => array_values($urlGroup)]]);
+            }
         }
     }
 
