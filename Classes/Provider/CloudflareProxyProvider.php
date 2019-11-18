@@ -174,9 +174,7 @@ class CloudflareProxyProvider implements ProxyProviderInterface
         $availableZones = $this->getZones();
         foreach ($availableZones as $domain => $zoneId) {
             $groupedUrls[$zoneId] = array_filter($urls, function($url) use ($domain) {
-                $urlParts = [];
-                parse_str($url, $urlParts);
-                $domainOfUrl = $urlParts['host'];
+                $domainOfUrl = parse_url($url, PHP_URL_HOST);
                 if (stripos('.' . $domainOfUrl, '.' . $domain) !== false) {
                     return true;
                 }

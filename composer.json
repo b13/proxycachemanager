@@ -32,5 +32,10 @@
 		"psr-4": {
 			"B13\\Proxycachemanager\\": "Classes/"
 		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"B13\\Proxycachemanager\\Tests\\": "Tests/"
+		}
 	}
 }
