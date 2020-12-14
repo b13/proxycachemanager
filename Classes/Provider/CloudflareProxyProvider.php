@@ -155,6 +155,10 @@ class CloudflareProxyProvider implements ProxyProviderInterface
     protected function initializeClient(string $zoneId, string $apiToken)
     {
         $httpOptions = $GLOBALS['TYPO3_CONF_VARS']['HTTP'];
+        if (isset($httpOptions['handler']) && empty($httpOptions['handler'])) {
+            // let guzzle choose hander
+            unset($httpOptions['handler']);
+        }
         $httpOptions['base_uri'] = str_replace('{zoneId}', $zoneId, $this->baseUrl);
         $httpOptions['headers']['Content-Type'] = 'application/json';
         $httpOptions['headers']['Authorization'] = 'Bearer ' . $apiToken;
