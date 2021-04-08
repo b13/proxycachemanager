@@ -1,0 +1,44 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  B13\Proxycachemanager\ResourceStorageOperations\:
+    resource: '../Classes/ResourceStorageOperations/*'
+
+  B13\Proxycachemanager\ResourceStorageOperations\Listener\BeforeFileDeleted:
+    tags:
+      - name: event.listener
+        identifier: 'b13-proxycachemanager-beforeFileDeleted'
+        event: TYPO3\CMS\Core\Resource\Event\BeforeFileDeletedEvent
+  B13\Proxycachemanager\ResourceStorageOperations\Listener\BeforeFileMoved:
+    tags:
+      - name: event.listener
+        identifier: 'b13-proxycachemanager-beforeFileMoved'
+        event: TYPO3\CMS\Core\Resource\Event\BeforeFileMovedEvent
+  B13\Proxycachemanager\ResourceStorageOperations\Listener\BeforeFileRenamed:
+    tags:
+      - name: event.listener
+        identifier: 'b13-proxycachemanager-beforeFileRenamed'
+        event: TYPO3\CMS\Core\Resource\Event\BeforeFileRenamedEvent
+  B13\Proxycachemanager\ResourceStorageOperations\Listener\BeforeFileReplaced:
+    tags:
+      - name: event.listener
+        identifier: 'b13-proxycachemanager-beforeFileReplaced'
+        event: TYPO3\CMS\Core\Resource\Event\BeforeFileReplacedEvent
+  B13\Proxycachemanager\ResourceStorageOperations\Listener\BeforeFolderDeleted:
+    tags:
+      - name: event.listener
+        identifier: 'b13-proxycachemanager-beforeFolderDeleted'
+        event: TYPO3\CMS\Core\Resource\Event\BeforeFolderDeletedEvent
+  B13\Proxycachemanager\ResourceStorageOperations\Listener\BeforeFolderMoved:
+    tags:
+      - name: event.listener
+        identifier: 'b13-proxycachemanager-beforeFolderMoved'
+        event: TYPO3\CMS\Core\Resource\Event\BeforeFolderMovedEvent
+  B13\Proxycachemanager\ResourceStorageOperations\Listener\BeforeFolderRenamed:
+    tags:
+      - name: event.listener
+        identifier: 'b13-proxycachemanager-beforeFolderRenamed'
+        event: TYPO3\CMS\Core\Resource\Event\BeforeFolderRenamedEvent
