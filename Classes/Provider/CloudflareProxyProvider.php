@@ -16,6 +16,7 @@ namespace B13\Proxycachemanager\Provider;
  */
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 
 /**
  * Uses Cloudflare v4 API with API Tokens (not API Keys).
@@ -66,7 +67,10 @@ class CloudflareProxyProvider implements ProxyProviderInterface
                 continue;
             }
             $data = ['json' => ['files' => array_values($urls)]];
-            $this->getClient($zoneId)->post('purge_cache', $data);
+            try {
+                $this->getClient($zoneId)->post('purge_cache', $data);
+            } catch (RequestException $e) {
+            }
         }
     }
 
@@ -80,7 +84,10 @@ class CloudflareProxyProvider implements ProxyProviderInterface
         }
         if (empty($urls)) {
             foreach ($this->getZones() as $domain => $zoneId) {
-                $this->getClient($zoneId)->post('purge_cache', ['json' => ['purge_everything' => true]]);
+                try {
+                    $this->getClient($zoneId)->post('purge_cache', ['json' => ['purge_everything' => true]]);
+                } catch (RequestException $e) {
+                }
             }
         } else {
             $groupedUrls = $this->groupUrlsByAllowedZones($urls);
@@ -121,7 +128,10 @@ class CloudflareProxyProvider implements ProxyProviderInterface
         $urlGroups = array_chunk($urls, $chunkSize);
         foreach ($urlGroups as $urlGroup) {
             if (!empty($urlGroup)) {
-                $client->post('purge_cache', ['json' => ['files' => array_values($urlGroup)]]);
+                try {
+                    $client->post('purge_cache', ['json' => ['files' => array_values($urlGroup)]]);
+                } catch (RequestException $e) {
+                }
             }
         }
     }
