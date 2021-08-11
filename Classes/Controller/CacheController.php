@@ -16,8 +16,10 @@ namespace B13\Proxycachemanager\Controller;
  */
 
 use B13\Proxycachemanager\Provider\ProxyProviderInterface;
+use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Toolbar\ClearCacheActionsHookInterface;
+use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
 use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -26,6 +28,15 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class CacheController implements ClearCacheActionsHookInterface
 {
+    /**
+     * @var FrontendInterface
+     */
+    protected $proxyCache;
+
+    public function __construct(FrontendInterface $proxyCache = null)
+    {
+        $this->proxyCache = $proxyCache ?? GeneralUtility::makeInstance(CacheManager::class)->getCache('tx_proxy');
+    }
 
     /**
      * Modifies CacheMenuItems array and adds a "flush CDN caches"
@@ -61,9 +72,11 @@ class CacheController implements ClearCacheActionsHookInterface
     {
         $providerClassName = $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['tx_proxy']['options']['reverseProxyProvider'] ?? null;
         if ($providerClassName) {
+            $backend = $this->proxyCache->getBackend();
+            $urls = $backend->getAllCachedUrls();
             /** @var ProxyProviderInterface $cacheProvider */
             $proxyProvider = GeneralUtility::makeInstance($providerClassName);
-            $proxyProvider->flushAllUrls();
+            $proxyProvider->flushAllUrls($urls);
             $content = [
                 'success' => true,
                 'message' => $this->getLanguageService()->sL('LLL:EXT:proxycachemanager/Resources/Private/Language/locallang.xlf:purge.success')
