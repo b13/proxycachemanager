@@ -3,3 +3,6 @@ reverseProxyProvider = B13\Proxycachemanager\Provider\VarnishHttpProxyProvider
 
 # cat=proxy; label=Define the IP/hostname of the reverse proxy:Use multiple hosts as a comma-separated list, also, you can use these variables ({scheme}, {host}, {port}, {user}, {pass}, {path}, {query}, {fragment}, {url}) to make PURGE calls dynamically. Useful for nginx. Usually http://127.0.0.1:8023/{path} should do the trick
 reverseProxyEndpoints = http://{host}/purge/{path}
+
+# cat=basic//; type=boolean; label=Enable Backend module
+showBackendModule = 1

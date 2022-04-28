@@ -1,0 +1,27 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
+
+<f:flashMessages as="flashMessages">
+	<f:for each="{flashMessages}" as="flashMessage">
+		<f:be.infobox title="{flashMessage.title}" message="{flashMessage.message}" state="{flashMessage.severity}" iconName="times"/>
+	</f:for>
+</f:flashMessages>
+
+<h1>CDN Cache Management</h1>
+
+<hr />
+
+<h2>Purge by URL</h2>
+<div class="row">
+	<div class="col-sm-12 col-md-6">
+		<f:form action="purgeUrl">
+			<div class="form-group">
+				<label for="url">URL</label>
+				<f:form.textfield name="url" class="form-control" id="url" placeholder="https://example.com/my-url/" />
+			</div>
+			<f:form.submit class="btn btn-default" value="Purge URL" />
+		</f:form>
+	</div>
+</div>
+<hr />
+
+</html>
