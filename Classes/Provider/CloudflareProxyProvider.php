@@ -150,7 +150,7 @@ class CloudflareProxyProvider implements ProxyProviderInterface
      */
     protected function getClient(string $zoneId): Client
     {
-        if (!$this->clients[$zoneId]) {
+        if (!isset($this->clients[$zoneId])) {
             $this->clients[$zoneId] = $this->initializeClient($zoneId, getenv('CLOUDFLARE_API_TOKEN'));
         }
         return $this->clients[$zoneId];
