@@ -41,7 +41,7 @@ class FrontendHook implements LoggerAwareInterface
      */
     public function insertPageIncache(TypoScriptFrontendController $parentObject, $timeOutTime)
     {
-        if (!$GLOBALS['TYPO3_CONF_VARS']['SYS']['reverseProxyIP']) {
+        if (!isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['reverseProxyIP'])) {
              return;
         }
         try {

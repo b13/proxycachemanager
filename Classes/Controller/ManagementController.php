@@ -65,6 +65,14 @@ class ManagementController extends ActionController
             $this->redirect('index');
         }
         $url = htmlspecialchars($url);
+        if (!isset($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['proxycachemanager']['reverseProxyProvider'])) {
+            $this->addFlashMessage(
+                'Attempting to purge URL "' . $url . '". No matching provider configured.',
+                'Cache not flushed',
+                FlashMessage::ERROR
+            );
+            $this->redirect('index');
+        }
 
         $proxyProvider = GeneralUtility::makeInstance($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['proxycachemanager']['reverseProxyProvider']);
         if (!$proxyProvider instanceof ProxyProviderInterface) {

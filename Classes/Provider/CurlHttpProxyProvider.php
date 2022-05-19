@@ -175,7 +175,7 @@ class CurlHttpProxyProvider implements ProxyProviderInterface, SingletonInterfac
      */
     protected function getLogger()
     {
-        if (!$this->logger) {
+        if (!isset($this->logger)) {
             $this->logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
         }
 
