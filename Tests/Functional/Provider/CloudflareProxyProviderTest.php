@@ -29,7 +29,7 @@ class CloudflareProxyProviderTest extends FunctionalTestCase
     {
         $logger = new class extends AbstractLogger {
             public int $logsCalls = 0;
-            public function log($level, \Stringable|string $message, array $context = [])
+            public function log($level, $message, array $context = array())
             {
                 $this->logsCalls++;
             }
