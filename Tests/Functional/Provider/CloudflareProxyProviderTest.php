@@ -15,7 +15,6 @@ namespace B13\Proxycachemanager\Tests\Functional\Provider;
  * The TYPO3 project - inspiring people to share!
  */
 
-
 use B13\Proxycachemanager\Provider\CloudflareProxyProvider;
 use Psr\Log\AbstractLogger;
 use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
@@ -27,9 +26,9 @@ class CloudflareProxyProviderTest extends FunctionalTestCase
      */
     public function testIfFailuresAreLogged(): void
     {
-        $logger = new class extends AbstractLogger {
+        $logger = new class() extends AbstractLogger {
             public int $logsCalls = 0;
-            public function log($level, $message, array $context = array())
+            public function log($level, $message, array $context = [])
             {
                 $this->logsCalls++;
             }
