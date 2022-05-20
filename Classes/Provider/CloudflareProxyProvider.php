@@ -16,7 +16,9 @@ namespace B13\Proxycachemanager\Provider;
  */
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\TransferException;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 
 /**
  * Uses Cloudflare v4 API with API Tokens (not API Keys).
@@ -33,8 +35,10 @@ use GuzzleHttp\Exception\RequestException;
  *  'example.com' => 'ZONE_ID'
  * ];
  */
-class CloudflareProxyProvider implements ProxyProviderInterface
+class CloudflareProxyProvider implements ProxyProviderInterface, LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     /**
      * @var string
      */
@@ -69,7 +73,12 @@ class CloudflareProxyProvider implements ProxyProviderInterface
             $data = ['json' => ['files' => array_values($urls)]];
             try {
                 $this->getClient($zoneId)->post('purge_cache', $data);
-            } catch (RequestException $e) {
+            } catch (TransferException $e) {
+                $this->logger->error('Could not flush URLs for {zone} via POST "purge_cache"', [
+                    'urls' => $urls,
+                    'zone' => $zoneId,
+                    'exception' => $e
+                ]);
             }
         }
     }
@@ -86,7 +95,12 @@ class CloudflareProxyProvider implements ProxyProviderInterface
             foreach ($this->getZones() as $domain => $zoneId) {
                 try {
                     $this->getClient($zoneId)->post('purge_cache', ['json' => ['purge_everything' => true]]);
-                } catch (RequestException $e) {
+                } catch (TransferException $e) {
+                    $this->logger->error('Could not flush URLs for {zone} via POST "purge_cache"', [
+                        'urls' => $urls,
+                        'zone' => $zoneId,
+                        'exception' => $e
+                    ]);
                 }
             }
         } else {
@@ -130,7 +144,12 @@ class CloudflareProxyProvider implements ProxyProviderInterface
             if (!empty($urlGroup)) {
                 try {
                     $client->post('purge_cache', ['json' => ['files' => array_values($urlGroup)]]);
-                } catch (RequestException $e) {
+                } catch (TransferException $e) {
+                    $this->logger->error('Could not flush URLs for {zone} via POST "purge_cache"', [
+                        'urls' => $urls,
+                        'zone' => $zoneId,
+                        'exception' => $e
+                    ]);
                 }
             }
         }
