@@ -27,7 +27,10 @@ class CloudflareProxyProviderTest extends FunctionalTestCase
     public function testIfFailuresAreLogged(): void
     {
         $logger = new class() extends AbstractLogger {
-            public int $logsCalls = 0;
+            /**
+             * @var int
+             */
+            public $logsCalls = 0;
             public function log($level, $message, array $context = [])
             {
                 $this->logsCalls++;
