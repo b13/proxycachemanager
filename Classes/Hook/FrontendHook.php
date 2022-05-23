@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 namespace B13\Proxycachemanager\Hook;
 
 /*
@@ -17,10 +18,10 @@ namespace B13\Proxycachemanager\Hook;
 
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
-use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 /**
  * Class containing frontend-related hooks.
@@ -42,7 +43,7 @@ class FrontendHook implements LoggerAwareInterface
     public function insertPageIncache(TypoScriptFrontendController $parentObject, $timeOutTime)
     {
         if (!isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['reverseProxyIP'])) {
-             return;
+            return;
         }
         try {
             $cache = GeneralUtility::makeInstance(CacheManager::class)->getCache('tx_proxy');

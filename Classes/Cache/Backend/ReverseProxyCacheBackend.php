@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 namespace B13\Proxycachemanager\Cache\Backend;
 
 /*
@@ -47,9 +48,9 @@ class ReverseProxyCacheBackend extends Typo3DatabaseBackend implements Transient
             $this->reverseProxyProvider = GeneralUtility::makeInstance($className);
         } catch (\Exception $e) {
             throw new \InvalidArgumentException(
-                    'Invalid cache proxy provider class for Reverse Proxy Cache - Class "' . $className . '" not found.',
-                    1231267264
-                );
+                'Invalid cache proxy provider class for Reverse Proxy Cache - Class "' . $className . '" not found.',
+                1231267264
+            );
         }
     }
 
@@ -127,13 +128,13 @@ class ReverseProxyCacheBackend extends Typo3DatabaseBackend implements Transient
     public function flushByTags(array $tags)
     {
         $identifiers = [];
-        foreach($tags as $tag) {
+        foreach ($tags as $tag) {
             $identifiers = array_merge($identifiers, $this->findIdentifiersByTag($tag));
         }
         $identifiers = array_unique($identifiers);
 
         $urls = [];
-        foreach($identifiers as $entryIdentifier) {
+        foreach ($identifiers as $entryIdentifier) {
             $urls[] = $this->get($entryIdentifier);
         }
         $urls = array_unique($urls);

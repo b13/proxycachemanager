@@ -15,13 +15,11 @@ namespace B13\Proxycachemanager\Tests\Unit\Provider;
  * The TYPO3 project - inspiring people to share!
  */
 
-
 use B13\Proxycachemanager\Provider\CloudflareProxyProvider;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
 /**
  * Class CloudflareProxyProviderTest
- * @package B13\Proxycachemanager\Tests\Unit\Provider
  */
 class CloudflareProxyProviderTest extends UnitTestCase
 {
@@ -33,10 +31,10 @@ class CloudflareProxyProviderTest extends UnitTestCase
     {
         $zoneId = 'baz';
         $mock = $this->getAccessibleMock(CloudflareProxyProvider::class, ['getZones']);
-        $mock->expects($this->once())->method('getZones')->willReturn(['foo.bar' => $zoneId]);
+        $mock->expects(self::once())->method('getZones')->willReturn(['foo.bar' => $zoneId]);
         $cachedUrls = ['https://foo.bar/bazz'];
         $urls = $mock->_call('groupUrlsByAllowedZones', $cachedUrls);
-        $this->assertSame([$zoneId => $cachedUrls], $urls);
+        self::assertSame([$zoneId => $cachedUrls], $urls);
     }
 
     /**
@@ -46,10 +44,10 @@ class CloudflareProxyProviderTest extends UnitTestCase
     {
         $zoneId = 'baz';
         $mock = $this->getAccessibleMock(CloudflareProxyProvider::class, ['getZones']);
-        $mock->expects($this->once())->method('getZones')->willReturn(['foo.bar' => $zoneId]);
+        $mock->expects(self::once())->method('getZones')->willReturn(['foo.bar' => $zoneId]);
         $cachedUrls = ['https://bar/bazz'];
         $urls = $mock->_call('groupUrlsByAllowedZones', $cachedUrls);
-        $this->assertSame([$zoneId => []], $urls);
+        self::assertSame([$zoneId => []], $urls);
     }
 
     /**
@@ -59,12 +57,12 @@ class CloudflareProxyProviderTest extends UnitTestCase
     {
         $zoneId = 'baz';
         $mock = $this->getAccessibleMock(CloudflareProxyProvider::class, ['getZones']);
-        $mock->expects($this->once())->method('getZones')->willReturn(['foo.bar' => $zoneId]);
+        $mock->expects(self::once())->method('getZones')->willReturn(['foo.bar' => $zoneId]);
         $cachedUrls = [
             'https://foo.bar/bazz',
-            'https://bar/bazz'
+            'https://bar/bazz',
         ];
         $urls = $mock->_call('groupUrlsByAllowedZones', $cachedUrls);
-        $this->assertSame([$zoneId => ['https://foo.bar/bazz']], $urls);
+        self::assertSame([$zoneId => ['https://foo.bar/bazz']], $urls);
     }
 }

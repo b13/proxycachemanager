@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 namespace B13\Proxycachemanager\ResourceStorageOperations;
 
 /*
@@ -22,7 +23,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class ResourceStorageSlot
 {
-
     protected $cacheService;
 
     public function __construct()
@@ -65,5 +65,4 @@ class ResourceStorageSlot
     {
         $this->cacheService->flushCachesForFolder($folder);
     }
-
 }

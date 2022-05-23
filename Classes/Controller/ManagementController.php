@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 namespace B13\Proxycachemanager\Controller;
 
 /*
@@ -29,7 +30,7 @@ use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
  */
 class ManagementController extends ActionController
 {
-     protected $defaultViewObjectName = BackendTemplateView::class;
+    protected $defaultViewObjectName = BackendTemplateView::class;
 
     /**
      * @var BackendTemplateView
@@ -42,7 +43,6 @@ class ManagementController extends ActionController
 
     /**
      * @param string $tag
-     * @return void
      */
     public function clearTagAction(string $tag)
     {
@@ -57,7 +57,6 @@ class ManagementController extends ActionController
 
     /**
      * @param string $url
-     * @return void
      */
     public function purgeUrlAction(string $url)
     {

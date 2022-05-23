@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 namespace B13\Proxycachemanager\Controller;
 
 /*
@@ -44,7 +45,7 @@ class CacheController implements ClearCacheActionsHookInterface
                 'title' => 'LLL:EXT:proxycachemanager/Resources/Private/Language/locallang.xlf:menuitem.title',
                 'description' => 'LLL:EXT:proxycachemanager/Resources/Private/Language/locallang.xlf:menuitem.description',
                 'href' => $uriBuilder->buildUriFromRoute('ajax_proxy_flushcaches'),
-                'iconIdentifier' => 'actions-system-cache-clear-impact-medium'
+                'iconIdentifier' => 'actions-system-cache-clear-impact-medium',
             ];
             // Move "our" item on second place
             $firstItem = array_shift($cacheActions);
@@ -66,17 +67,17 @@ class CacheController implements ClearCacheActionsHookInterface
             $proxyProvider->flushAllUrls();
             $content = [
                 'success' => true,
-                'message' => $this->getLanguageService()->sL('LLL:EXT:proxycachemanager/Resources/Private/Language/locallang.xlf:purge.success')
+                'message' => $this->getLanguageService()->sL('LLL:EXT:proxycachemanager/Resources/Private/Language/locallang.xlf:purge.success'),
             ];
         } else {
             $content = [
                 'status' => true,
-                'message' => $this->getLanguageService()->sL('LLL:EXT:proxycachemanager/Resources/Private/Language/locallang.xlf:purge.failure')
+                'message' => $this->getLanguageService()->sL('LLL:EXT:proxycachemanager/Resources/Private/Language/locallang.xlf:purge.failure'),
             ];
         }
         // we cannot add our own message unfortunately
         $response = new Response();
-        #$response->getBody()->write(json_encode($content));
+        //$response->getBody()->write(json_encode($content));
         return $response;
     }
 
@@ -87,5 +88,4 @@ class CacheController implements ClearCacheActionsHookInterface
     {
         return $GLOBALS['LANG'];
     }
-
 }

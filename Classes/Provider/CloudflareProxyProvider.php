@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 namespace B13\Proxycachemanager\Provider;
 
 /*
@@ -77,7 +78,7 @@ class CloudflareProxyProvider implements ProxyProviderInterface, LoggerAwareInte
                 $this->logger->error('Could not flush URLs for {zone} via POST "purge_cache"', [
                     'urls' => $urls,
                     'zone' => $zoneId,
-                    'exception' => $e
+                    'exception' => $e,
                 ]);
             }
         }
@@ -99,7 +100,7 @@ class CloudflareProxyProvider implements ProxyProviderInterface, LoggerAwareInte
                     $this->logger->error('Could not flush URLs for {zone} via POST "purge_cache"', [
                         'urls' => $urls,
                         'zone' => $zoneId,
-                        'exception' => $e
+                        'exception' => $e,
                     ]);
                 }
             }
@@ -148,7 +149,7 @@ class CloudflareProxyProvider implements ProxyProviderInterface, LoggerAwareInte
                     $this->logger->error('Could not flush URLs for {zone} via POST "purge_cache"', [
                         'urls' => $urls,
                         'zone' => $zoneId,
-                        'exception' => $e
+                        'exception' => $e,
                     ]);
                 }
             }
@@ -206,7 +207,7 @@ class CloudflareProxyProvider implements ProxyProviderInterface, LoggerAwareInte
         $groupedUrls = [];
         $availableZones = $this->getZones();
         foreach ($availableZones as $domain => $zoneId) {
-            $groupedUrls[$zoneId] = array_filter($urls, function($url) use ($domain) {
+            $groupedUrls[$zoneId] = array_filter($urls, function ($url) use ($domain) {
                 $domainOfUrl = parse_url($url, PHP_URL_HOST);
                 if (stripos('.' . $domainOfUrl, '.' . $domain) !== false) {
                     return true;
