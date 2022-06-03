@@ -20,6 +20,7 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException;
+use TYPO3\CMS\Core\Page\AssetCollector;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
@@ -57,7 +58,10 @@ class FrontendHook implements LoggerAwareInterface
                 [$url, $pageUid]
             );
 
-            foreach ($parentObject->imagesOnPage as $imageUrl) {
+            $imageUrls = GeneralUtility::makeInstance(AssetCollector::class)->getMedia();
+            $imageUrls = array_keys($imageUrls);
+
+            foreach ($imageUrls as $imageUrl) {
                 // Only cache local files
                 $hasSchema = parse_url($imageUrl, PHP_URL_SCHEME);
                 if (!empty($hasSchema)) {
