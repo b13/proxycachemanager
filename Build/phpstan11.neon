@@ -7,9 +7,6 @@ parameters:
 
   ignoreErrors:
     -
-      message: '#.*TYPO3\\CMS\\Frontend\\Page\\PageRepository.*#'
-      path: %currentWorkingDirectory%/Classes/Domain/Repository/MenuRepository.php
-    -
       message: '#Constant ORIGINAL_ROOT not found.#'
       path: %currentWorkingDirectory%/Tests
     -
