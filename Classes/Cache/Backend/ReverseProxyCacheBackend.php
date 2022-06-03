@@ -152,7 +152,7 @@ class ReverseProxyCacheBackend extends Typo3DatabaseBackend implements Transient
         $urls = [];
         $conn = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable($this->cacheTable);
         $stmt = $conn->select(['content'], $this->cacheTable);
-        while ($url = $stmt->fetchColumn(0)) {
+        while ($url = $stmt->fetchOne(0)) {
             $urls[] = $url;
         }
         return $urls;
