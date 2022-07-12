@@ -101,13 +101,13 @@ class CurlHttpProxyProvider implements ProxyProviderInterface, SingletonInterfac
             $active = null;
             do {
                 $multiExecResult = curl_multi_exec($curlQueueHandler, $active);
-            } while (CURLM_CALL_MULTI_PERFORM == $multiExecResult);
+            } while ($multiExecResult == CURLM_CALL_MULTI_PERFORM);
 
-            while ($active && CURLM_OK == $multiExecResult) {
+            while ($active && $multiExecResult == CURLM_OK) {
                 if (curl_multi_select($curlQueueHandler) != -1) {
                     do {
                         $multiExecResult = curl_multi_exec($curlQueueHandler, $active);
-                    } while (CURLM_CALL_MULTI_PERFORM == $multiExecResult);
+                    } while ($multiExecResult == CURLM_CALL_MULTI_PERFORM);
                 }
             }
 
