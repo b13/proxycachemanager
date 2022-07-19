@@ -36,8 +36,7 @@ class CacheController implements ClearCacheActionsHookInterface
      */
     public function manipulateCacheActions(&$cacheActions, &$optionValues)
     {
-        $providerClassName = $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['tx_proxy']['options']['reverseProxyProvider'] ?? null;
-        if (!empty($providerClassName) && $GLOBALS['BE_USER']->isAdmin()) {
+        if ($this->shouldShowCacheFlushButton()) {
             $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
             $optionValues[] = 'clearProxyCache';
             $item = [
@@ -52,6 +51,25 @@ class CacheController implements ClearCacheActionsHookInterface
             array_unshift($cacheActions, $item);
             array_unshift($cacheActions, $firstItem);
         }
+    }
+
+    public function shouldShowCacheFlushButton()
+    {
+        $providerClassName = $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['tx_proxy']['options']['reverseProxyProvider'] ?? null;
+        if (empty($providerClassName)) {
+            return false;
+        }
+        $userTsConfig = $GLOBALS['BE_USER']->getTSConfig();
+        $isAdmin = $GLOBALS['BE_USER']->isAdmin();
+        // Clearing of proxy caches is only shown if explicitly enabled via TSConfig
+        // or if BE-User is admin and the TSconfig explicitly disables the possibility for admins.
+        // This is useful for big production systems where admins accidentally could slow down the system.
+        if (($userTsConfig['options.']['clearCache.']['proxy'] ?? false)
+            || ($isAdmin && (bool)($userTsConfig['options.']['clearCache.']['proxy'] ?? true)))
+        {
+            return true;
+        }
+        return false;
     }
 
     /**

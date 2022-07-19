@@ -39,7 +39,7 @@ If only a certain tag is removed, the PURGE call is made only to the relevant UR
 ### Fastly
 
 Fastly makes a direct HTTP PURGE call to a specific URL, so it needs to be ensured that the request comes directly
-from the production environment (CDN backend server) where access to fastly is allowed, and PURGE requests are accepted. 
+from the production environment (CDN backend server) where access to fastly is allowed, and PURGE requests are accepted.
 
 Ensure to set the environment variables `FASTLY_SERVICE_ID` and `FASTLY_API_TOKEN`.
 
@@ -57,6 +57,18 @@ Add this to your `AdditionalConfiguration.php` file:
     $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['proxycachemanager']['cloudflare']['zones'] = [
         'example.com' => 'MY_ZONE_ID'
     ];
+
+By default all administrators can flush the CDN caches via the toolbar
+on the top right corner of TYPO3's Backend.
+
+To enable the button for non-admin editors, use this UserTsConfig option:
+
+`options.clearCache.proxy = 1`
+
+To explicitly disable the button for specific administrators, use this
+UserTsConfig option:
+
+`options.clearCache.proxy = 0`
 
 #### Limitations
  - Only API Token authentication is available
