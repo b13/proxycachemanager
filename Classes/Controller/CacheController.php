@@ -65,8 +65,7 @@ class CacheController implements ClearCacheActionsHookInterface
         // or if BE-User is admin and the TSconfig explicitly disables the possibility for admins.
         // This is useful for big production systems where admins accidentally could slow down the system.
         if (($userTsConfig['options.']['clearCache.']['proxy'] ?? false)
-            || ($isAdmin && (bool)($userTsConfig['options.']['clearCache.']['proxy'] ?? true)))
-        {
+            || ($isAdmin && (bool)($userTsConfig['options.']['clearCache.']['proxy'] ?? true))) {
             return true;
         }
         return false;
