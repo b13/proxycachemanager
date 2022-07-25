@@ -78,7 +78,7 @@ class CacheService implements SingletonInterface
         $sites = $this->siteFinder->getAllSites();
         foreach ($sites as $site) {
             foreach ($publicUrls as $publicUrl) {
-                $urls[] = rtrim($site->getBase()->__toString(), '/') . '/' . $publicUrl;
+                $urls[] = rtrim($site->getBase()->__toString(), '/') . '/' . ltrim($publicUrl, '/');
             }
         }
         if (!empty($urls)) {
