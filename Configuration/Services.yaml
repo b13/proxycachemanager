@@ -42,3 +42,9 @@ services:
       - name: event.listener
         identifier: 'b13-proxycachemanager-beforeFolderRenamed'
         event: TYPO3\CMS\Core\Resource\Event\BeforeFolderRenamedEvent
+
+  B13\Proxycachemanager\ResourceStorageOperations\Listener\AfterFileAdded:
+    tags:
+      - name: event.listener
+        identifier: 'b13-proxycachemanager-afterFileAdded'
+        event: TYPO3\CMS\Core\Resource\Event\AfterFileAddedEvent
