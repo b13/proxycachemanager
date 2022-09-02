@@ -92,22 +92,15 @@ class CloudflareProxyProvider implements ProxyProviderInterface, LoggerAwareInte
         if (!$this->isActive()) {
             return;
         }
-        if (empty($urls)) {
-            foreach ($this->getZones() as $domain => $zoneId) {
-                try {
-                    $this->getClient($zoneId)->post('purge_cache', ['json' => ['purge_everything' => true]]);
-                } catch (TransferException $e) {
-                    $this->logger->error('Could not flush URLs for {zone} via POST "purge_cache"', [
-                        'urls' => $urls,
-                        'zone' => $zoneId,
-                        'exception' => $e,
-                    ]);
-                }
-            }
-        } else {
-            $groupedUrls = $this->groupUrlsByAllowedZones($urls);
-            foreach ($groupedUrls as $zoneId => $urls) {
-                $this->purgeInChunks($zoneId, $urls);
+        foreach ($this->getZones() as $domain => $zoneId) {
+            try {
+                $this->getClient($zoneId)->post('purge_cache', ['json' => ['purge_everything' => true]]);
+            } catch (TransferException $e) {
+                $this->logger->error('Could not flush URLs for {zone} via POST "purge_cache"', [
+                    'urls' => $urls,
+                    'zone' => $zoneId,
+                    'exception' => $e,
+                ]);
             }
         }
     }
