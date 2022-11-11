@@ -135,14 +135,14 @@ class CurlHttpProxyProvider implements ProxyProviderInterface, SingletonInterfac
         $finalEndpointUrl = str_replace(
             ['{scheme}', '{host}', '{port}', '{user}', '{pass}', '{path}', '{query}', '{fragment}', '{url}'],
             [
-                $urlParts['scheme'],
-                $urlParts['host'],
-                $urlParts['port'],
-                $urlParts['user'],
-                $urlParts['pass'],
-                trim($urlParts['path'], '/'),
-                $urlParts['query'],
-                $urlParts['fragment'],
+                $urlParts['scheme'] ?? '',
+                $urlParts['host'] ?? '',
+                $urlParts['port'] ?? '',
+                $urlParts['user'] ?? '',
+                $urlParts['pass'] ?? '',
+                trim($urlParts['path'] ?? '', '/'),
+                $urlParts['query'] ?? '',
+                $urlParts['fragment'] ?? '',
                 $urlToPurge,
             ],
             $endpointUrl
