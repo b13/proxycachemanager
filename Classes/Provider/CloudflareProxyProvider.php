@@ -17,6 +17,7 @@ namespace B13\Proxycachemanager\Provider;
  */
 
 use GuzzleHttp\Client;
+use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Exception\TransferException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
@@ -178,9 +179,17 @@ class CloudflareProxyProvider implements ProxyProviderInterface, LoggerAwareInte
     protected function initializeClient(string $zoneId, string $apiToken)
     {
         $httpOptions = $GLOBALS['TYPO3_CONF_VARS']['HTTP'];
-        if (isset($httpOptions['handler']) && empty($httpOptions['handler'])) {
-            // let guzzle choose hander
-            unset($httpOptions['handler']);
+        if (isset($httpOptions['handler'])) {
+            if (is_array($httpOptions['handler'] && !empty($httpOptions['handler']))) {
+                $stack = HandlerStack::create();
+                foreach ($httpOptions['handler'] as $handler) {
+                    $stack->push($handler);
+                }
+                $httpOptions['handler'] = $stack;
+            }
+            else {
+                unset($httpOptions['handler']);
+            }
         }
         $httpOptions['base_uri'] = str_replace('{zoneId}', $zoneId, $this->baseUrl);
         $httpOptions['headers']['Content-Type'] = 'application/json';

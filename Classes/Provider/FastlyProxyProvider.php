@@ -17,6 +17,7 @@ namespace B13\Proxycachemanager\Provider;
  */
 
 use GuzzleHttp\Client;
+use GuzzleHttp\HandlerStack;
 
 class FastlyProxyProvider implements ProxyProviderInterface
 {
@@ -92,6 +93,18 @@ class FastlyProxyProvider implements ProxyProviderInterface
     protected function initializeClient($serviceId, $apiToken)
     {
         $httpOptions = $GLOBALS['TYPO3_CONF_VARS']['HTTP'];
+        if (isset($httpOptions['handler'])) {
+            if (is_array($httpOptions['handler'] && !empty($httpOptions['handler']))) {
+                $stack = HandlerStack::create();
+                foreach ($httpOptions['handler'] as $handler) {
+                    $stack->push($handler);
+                }
+                $httpOptions['handler'] = $stack;
+            }
+            else {
+                unset($httpOptions['handler']);
+            }
+        }
         $httpOptions['verify'] = filter_var($httpOptions['verify'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? $httpOptions['verify'];
         $httpOptions['base_uri'] = str_replace('{serviceId}', $serviceId, $this->baseUrl);
         $httpOptions['headers']['Fastly-Key'] = $apiToken;
