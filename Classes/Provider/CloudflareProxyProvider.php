@@ -17,8 +17,8 @@ namespace B13\Proxycachemanager\Provider;
  */
 
 use GuzzleHttp\Client;
-use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Exception\TransferException;
+use GuzzleHttp\HandlerStack;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
@@ -186,8 +186,7 @@ class CloudflareProxyProvider implements ProxyProviderInterface, LoggerAwareInte
                     $stack->push($handler);
                 }
                 $httpOptions['handler'] = $stack;
-            }
-            else {
+            } else {
                 unset($httpOptions['handler']);
             }
         }

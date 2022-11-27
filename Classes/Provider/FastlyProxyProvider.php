@@ -100,8 +100,7 @@ class FastlyProxyProvider implements ProxyProviderInterface
                     $stack->push($handler);
                 }
                 $httpOptions['handler'] = $stack;
-            }
-            else {
+            } else {
                 unset($httpOptions['handler']);
             }
         }
