@@ -82,7 +82,7 @@ class CacheService implements SingletonInterface
             }
         }
         if (!empty($urls)) {
-            $proxyProvider->flushAllUrls($urls);
+            $proxyProvider->flushCacheForUrls($urls);
         }
     }
 }
