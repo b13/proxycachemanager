@@ -20,7 +20,6 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException;
-use TYPO3\CMS\Core\Page\AssetCollector;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
@@ -52,38 +51,11 @@ class FrontendHook implements LoggerAwareInterface
 
             // cache the page URL that was called
             $url = GeneralUtility::getIndpEnv('TYPO3_REQUEST_URL');
-            $cache->set(md5($url), $url, $parentObject->getPageCacheTags());
+            $cache->set(md5($url), $url, $parentObject->getPageCacheTags(), $timeOutTime);
             $this->logger->info(
                 'Marking page "%s" (uid %s) as cached.',
                 [$url, $pageUid]
             );
-
-            $imageUrls = GeneralUtility::makeInstance(AssetCollector::class)->getMedia();
-            $imageUrls = array_keys($imageUrls);
-
-            foreach ($imageUrls as $imageUrl) {
-                // Only cache local files
-                $hasSchema = parse_url($imageUrl, PHP_URL_SCHEME);
-                if (!empty($hasSchema)) {
-                    continue;
-                }
-                // If it's not from an extension, clear the cache
-                // Extension files are not changed, only during deployment, where we expect that all caches
-                // Are flushed
-                if (strpos($imageUrl, 'typo3conf/ext/') !== false) {
-                    continue;
-                }
-                // processed images are not cached either
-                if (strpos($imageUrl, '/_processed_') !== false) {
-                    continue;
-                }
-                $url = GeneralUtility::getIndpEnv('TYPO3_SITE_URL') . $imageUrl;
-                $cache->set(md5($url), $url, $parentObject->getPageCacheTags());
-                $this->logger->info(
-                    'Marking image "%s" (on page %s) as cached.',
-                    [$url, $pageUid]
-                );
-            }
         } catch (NoSuchCacheException $e) {
             // No cache, nothing to do
         }
