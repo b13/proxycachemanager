@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace B13\Proxycachemanager\Controller;
+namespace B13\Proxycachemanager\Listener;
 
 /*
  * This file is part of the b13 TYPO3 extensions family.
@@ -19,30 +19,26 @@ namespace B13\Proxycachemanager\Controller;
 
 use B13\Proxycachemanager\Configuration;
 use B13\Proxycachemanager\Provider\ProxyProviderInterface;
-use Psr\Http\Message\ResponseInterface;
-use TYPO3\CMS\Core\Http\Response;
+use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
+use TYPO3\CMS\Frontend\Event\AfterCachedPageIsPersistedEvent;
 
-/**
- * Class to handle flushing all caches
- */
-class CacheController
+class AfterCacheIsPersisted
 {
     protected ProxyProviderInterface $proxyProvider;
 
-    public function __construct(protected Configuration $configuration)
+    public function __construct(protected FrontendInterface $cache, Configuration $configuration)
     {
         $this->proxyProvider = $configuration->getProxyProvider();
     }
 
-    /**
-     * AJAX endpoint when triggering the call from the cache menu
-     */
-    public function flushAction(): ResponseInterface
+    public function __invoke(AfterCachedPageIsPersistedEvent $event): void
     {
-        if ($this->proxyProvider->isActive() && $this->configuration->backendFlushEnabled()) {
-            $this->proxyProvider->flushAllUrls();
+        file_put_contents('/tmp/after.txt', '1');
+        if (!$this->proxyProvider->isActive()) {
+            return;
         }
-        $response = new Response();
-        return $response;
+        $cacheTags = $event->getController()->getPageCacheTags();
+        $url = (string)$event->getRequest()->getUri();
+        $this->cache->set(md5($url), $url, $cacheTags, $event->getCacheLifetime());
     }
 }

@@ -1,9 +1,11 @@
 <?php
 
-defined('TYPO3_MODE') or die('Access denied!');
+defined('TYPO3') or die();
 
-$proxyCacheManagerConfiguration = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class)->get('proxycachemanager');
-if ($proxyCacheManagerConfiguration['showBackendModule'] ?? false) {
+use B13\Proxycachemanager\Configuration;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
+if ((GeneralUtility::makeInstance(Configuration::class))->showBackendModule()) {
     \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerModule(
         'proxycachemanager',
         'site',

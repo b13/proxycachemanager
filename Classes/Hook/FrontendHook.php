@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace B13\Proxycachemanager\Hook;
 
 /*
@@ -16,19 +17,23 @@ namespace B13\Proxycachemanager\Hook;
  * The TYPO3 project - inspiring people to share!
  */
 
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
-use TYPO3\CMS\Core\Cache\CacheManager;
-use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
+use B13\Proxycachemanager\Configuration;
+use B13\Proxycachemanager\Provider\ProxyProviderInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 /**
  * Class containing frontend-related hooks.
  */
-class FrontendHook implements LoggerAwareInterface
+class FrontendHook
 {
-    use LoggerAwareTrait;
+    protected ProxyProviderInterface $proxyProvider;
+
+    public function __construct(protected FrontendInterface $cache, Configuration $configuration)
+    {
+        $this->proxyProvider = $configuration->getProxyProvider();
+    }
 
     /**
      * Hook that is called when a cacheable page was just added to the cache system
@@ -37,27 +42,21 @@ class FrontendHook implements LoggerAwareInterface
      * once (!) as the URL is cacheable, next time it is fetched
      * from the reverse proxy directly.
      *
-     * @param TypoScriptFrontendController $parentObject
+     * @param TypoScriptFrontendController $frontendController
      * @param $timeOutTime
      */
-    public function insertPageIncache(TypoScriptFrontendController $parentObject, $timeOutTime)
+    public function insertPageIncache(TypoScriptFrontendController $frontendController, $timeOutTime)
     {
-        if (!isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['reverseProxyIP'])) {
+        if (!$this->proxyProvider->isActive()) {
             return;
         }
-        try {
-            $cache = GeneralUtility::makeInstance(CacheManager::class)->getCache('tx_proxy');
-            $pageUid = $parentObject->id;
+        // cache the page URL that was called
+        $url = (string)$this->getRequest()->getUri();
+        $this->cache->set(md5($url), $url, $frontendController->getPageCacheTags(), $timeOutTime);
+    }
 
-            // cache the page URL that was called
-            $url = GeneralUtility::getIndpEnv('TYPO3_REQUEST_URL');
-            $cache->set(md5($url), $url, $parentObject->getPageCacheTags(), $timeOutTime);
-            $this->logger->info(
-                'Marking page "%s" (uid %s) as cached.',
-                [$url, $pageUid]
-            );
-        } catch (NoSuchCacheException $e) {
-            // No cache, nothing to do
-        }
+    protected function getRequest(): ?ServerRequestInterface
+    {
+        return $GLOBALS['TYPO3_REQUEST'];
     }
 }
