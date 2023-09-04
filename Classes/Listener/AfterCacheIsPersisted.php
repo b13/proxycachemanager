@@ -33,7 +33,6 @@ class AfterCacheIsPersisted
 
     public function __invoke(AfterCachedPageIsPersistedEvent $event): void
     {
-        file_put_contents('/tmp/after.txt', '1');
         if (!$this->proxyProvider->isActive()) {
             return;
         }
