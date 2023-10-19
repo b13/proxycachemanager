@@ -41,18 +41,18 @@ class ReverseProxyCacheBackend extends Typo3DatabaseBackend implements Transient
      * Removes all cache entries matching the specified identifier.
      * Usually this only affects one entry.
      *
+     * Please note: As remove() is called when using set() in the parent method,
+     * it would also flush the cache when the FE is accessed, resulting in a lot of
+     * cache entries. This should be avoided, for this reason, we do not call the
+     * provider anymore. Ideally we should not invalidate but rather push this actively
+     * to the proxy in the future.
+     *
      * @param string $entryIdentifier Specifies the cache entry to remove
      *
      * @return bool TRUE if (at least) an entry could be removed or FALSE if no entry was found
      */
     public function remove($entryIdentifier)
     {
-        // call the provider to forget this URL
-        $url = $this->get($entryIdentifier);
-        if ($url && $this->reverseProxyProvider->isActive()) {
-            $this->reverseProxyProvider->flushCacheForUrl($url);
-        }
-
         return parent::remove($entryIdentifier);
     }
 
