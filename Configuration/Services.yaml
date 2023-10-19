@@ -13,6 +13,8 @@ services:
 
   B13\Proxycachemanager\Controller\CacheController:
     public: true
+    arguments:
+      $cache: '@cache.tx_proxy'
 
   B13\Proxycachemanager\Listener\AfterCacheIsPersisted:
     tags:

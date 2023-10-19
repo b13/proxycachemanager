@@ -83,7 +83,7 @@ class ReverseProxyCacheBackend extends Typo3DatabaseBackend implements Transient
             foreach ($identifiers as $entryIdentifier) {
                 $url = $this->get($entryIdentifier);
                 if ($url) {
-                    $this->reverseProxyProvider->flushCacheForUrl($url);
+                    $this->reverseProxyProvider->flushCacheForUrls([$url]);
                 }
             }
         }

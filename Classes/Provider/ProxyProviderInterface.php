@@ -22,7 +22,6 @@ namespace B13\Proxycachemanager\Provider;
  */
 interface ProxyProviderInterface
 {
-    public function flushCacheForUrl(string $url): void;
     public function flushCacheForUrls(array $urls): void;
     public function flushAllUrls(array $urls = []): void;
     public function isActive(): bool;

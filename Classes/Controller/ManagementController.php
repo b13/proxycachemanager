@@ -81,7 +81,7 @@ class ManagementController extends ActionController
             return new RedirectResponse($this->uriBuilder->reset()->uriFor('index'));
         }
 
-        $this->proxyProvider->flushCacheForUrl($url);
+        $this->proxyProvider->flushCacheForUrls([$url]);
         $this->addFlashMessage(
             'Successfully purged URL "' . $url . '".',
             'Cache flushed',
