@@ -17,6 +17,8 @@ namespace B13\Proxycachemanager\Provider;
  * The TYPO3 project - inspiring people to share!
  */
 
+use Psr\Http\Message\RequestInterface;
+
 class NullProxyProvider implements ProxyProviderInterface
 {
     public function flushCacheForUrls(array $urls): void {}
@@ -24,6 +26,11 @@ class NullProxyProvider implements ProxyProviderInterface
     public function flushAllUrls(array $urls = []): void {}
 
     public function isActive(): bool
+    {
+        return false;
+    }
+
+    public function shouldRequestBeMarkedAsCached(RequestInterface $request): bool
     {
         return false;
     }

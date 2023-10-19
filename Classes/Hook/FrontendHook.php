@@ -47,7 +47,7 @@ class FrontendHook
      */
     public function insertPageIncache(TypoScriptFrontendController $frontendController, $timeOutTime)
     {
-        if (!$this->proxyProvider->isActive()) {
+        if (!$this->proxyProvider->isActive() || !$this->proxyProvider->shouldRequestBeMarkedAsCached($this->getRequest())) {
             return;
         }
         // cache the page URL that was called
