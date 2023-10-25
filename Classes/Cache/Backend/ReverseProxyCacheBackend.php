@@ -120,7 +120,7 @@ class ReverseProxyCacheBackend extends Typo3DatabaseBackend implements Transient
     /**
      * Fetch all URLs in the cache.
      */
-    protected function getAllCachedUrls()
+    protected function getAllCachedUrls(): array
     {
         $urls = [];
         $conn = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable($this->cacheTable);
