@@ -17,8 +17,8 @@ namespace B13\Proxycachemanager\Listener;
  * The TYPO3 project - inspiring people to share!
  */
 
-use B13\Proxycachemanager\Configuration;
 use B13\Proxycachemanager\Provider\ProxyProviderInterface;
+use B13\Proxycachemanager\ProxyConfiguration;
 use TYPO3\CMS\Backend\Backend\Event\ModifyClearCacheActionsEvent;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -27,7 +27,7 @@ class ModifyClearCacheActions
 {
     protected ProxyProviderInterface $proxyProvider;
 
-    public function __construct(protected Configuration $configuration)
+    public function __construct(protected ProxyConfiguration $configuration)
     {
         $this->proxyProvider = $configuration->getProxyProvider();
     }

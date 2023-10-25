@@ -25,7 +25,7 @@
 		}
 	},
     "require": {
-		"php": "^8.0",
+		"php": "^8.1",
 		"typo3/cms-backend": "^11.5 || ^12.4",
 		"typo3/cms-frontend": "^11.5 || ^12.4"
 	},

@@ -2,7 +2,7 @@
 
 defined('TYPO3') or die();
 
-use B13\Proxycachemanager\Configuration;
+use B13\Proxycachemanager\ProxyConfiguration;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 if (empty($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['tx_proxy'] ?? null)) {
@@ -11,7 +11,7 @@ if (empty($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['
         'backend' => \B13\Proxycachemanager\Cache\Backend\ReverseProxyCacheBackend::class,
         'options' => [
             'defaultLifetime' => 0, // @todo: should be not "infinite" but rather set to whatever the proxy settings are
-            'reverseProxyProvider' => (GeneralUtility::makeInstance(Configuration::class))->getProxyProvider(),
+            'reverseProxyProvider' => (GeneralUtility::makeInstance(ProxyConfiguration::class))->getProxyProvider(),
         ],
         // setting the pages group makes sure that when the page cache is cleared, that this cache is cleared as well
         'groups' => ['pages', 'proxy'],

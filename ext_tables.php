@@ -2,10 +2,10 @@
 
 defined('TYPO3') or die();
 
-use B13\Proxycachemanager\Configuration;
+use B13\Proxycachemanager\ProxyConfiguration;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-if ((GeneralUtility::makeInstance(Configuration::class))->showBackendModule()) {
+if ((GeneralUtility::makeInstance(ProxyConfiguration::class))->showBackendModule()) {
     \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerModule(
         'proxycachemanager',
         'site',

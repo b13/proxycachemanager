@@ -20,10 +20,12 @@ namespace B13\Proxycachemanager;
 use B13\Proxycachemanager\Provider\NullProxyProvider;
 use B13\Proxycachemanager\Provider\ProxyProviderInterface;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
-use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class Configuration implements SingletonInterface
+/**
+ * @internal
+ */
+class ProxyConfiguration
 {
     protected ?ProxyProviderInterface $proxyProvider = null;
 

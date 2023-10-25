@@ -17,8 +17,8 @@ namespace B13\Proxycachemanager\ResourceStorageOperations;
  * The TYPO3 project - inspiring people to share!
  */
 
-use B13\Proxycachemanager\Configuration;
 use B13\Proxycachemanager\Provider\ProxyProviderInterface;
+use B13\Proxycachemanager\ProxyConfiguration;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Resource\Folder;
 use TYPO3\CMS\Core\SingletonInterface;
@@ -28,7 +28,7 @@ class CacheService implements SingletonInterface
 {
     protected ProxyProviderInterface $proxyProvider;
 
-    public function __construct(protected SiteFinder $siteFinder, Configuration $configuration)
+    public function __construct(protected SiteFinder $siteFinder, ProxyConfiguration $configuration)
     {
         $this->proxyProvider = $configuration->getProxyProvider();
     }

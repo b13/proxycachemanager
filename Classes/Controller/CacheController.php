@@ -17,8 +17,8 @@ namespace B13\Proxycachemanager\Controller;
  * The TYPO3 project - inspiring people to share!
  */
 
-use B13\Proxycachemanager\Configuration;
 use B13\Proxycachemanager\Provider\ProxyProviderInterface;
+use B13\Proxycachemanager\ProxyConfiguration;
 use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
 use TYPO3\CMS\Core\Http\Response;
@@ -30,7 +30,7 @@ class CacheController
 {
     protected ProxyProviderInterface $proxyProvider;
 
-    public function __construct(protected FrontendInterface $cache, protected Configuration $configuration)
+    public function __construct(protected FrontendInterface $cache, protected ProxyConfiguration $configuration)
     {
         $this->proxyProvider = $configuration->getProxyProvider();
     }

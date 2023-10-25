@@ -4,12 +4,16 @@ services:
     autoconfigure: true
     public: false
 
+
   B13\Proxycachemanager\:
     resource: '../Classes/*'
   cache.tx_proxy:
     class: TYPO3\CMS\Core\Cache\Frontend\FrontendInterface
     factory: ['@TYPO3\CMS\Core\Cache\CacheManager', 'getCache']
     arguments: ['tx_proxy']
+
+  B13\Proxycachemanager\ProxyConfiguration:
+    public: true
 
   B13\Proxycachemanager\Controller\CacheController:
     public: true

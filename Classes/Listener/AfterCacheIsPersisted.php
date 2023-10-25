@@ -17,8 +17,8 @@ namespace B13\Proxycachemanager\Listener;
  * The TYPO3 project - inspiring people to share!
  */
 
-use B13\Proxycachemanager\Configuration;
 use B13\Proxycachemanager\Provider\ProxyProviderInterface;
+use B13\Proxycachemanager\ProxyConfiguration;
 use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
 use TYPO3\CMS\Frontend\Event\AfterCachedPageIsPersistedEvent;
 
@@ -26,7 +26,7 @@ class AfterCacheIsPersisted
 {
     protected ProxyProviderInterface $proxyProvider;
 
-    public function __construct(protected FrontendInterface $cache, Configuration $configuration)
+    public function __construct(protected FrontendInterface $cache, ProxyConfiguration $configuration)
     {
         $this->proxyProvider = $configuration->getProxyProvider();
     }
