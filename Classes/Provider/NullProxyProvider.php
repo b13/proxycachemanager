@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace B13\Proxycachemanager\Provider;
 
 /*
@@ -16,20 +17,21 @@ namespace B13\Proxycachemanager\Provider;
  * The TYPO3 project - inspiring people to share!
  */
 
-/**
- * can use some varnish specific calls
- * todo: add what is needed for varnish.
- */
-class VarnishHttpProxyProvider extends CurlHttpProxyProvider
+use Psr\Http\Message\RequestInterface;
+
+class NullProxyProvider implements ProxyProviderInterface
 {
-    /**
-     * flushes the whole proxy cache (directly).
-     *
-     * @param array $urls
-     */
-    public function flushAllUrls($urls = [])
+    public function flushCacheForUrls(array $urls): void {}
+
+    public function flushAllUrls(array $urls = []): void {}
+
+    public function isActive(): bool
     {
-        $this->queue = ['.*'];
-        $this->executeCacheFlush();
+        return false;
+    }
+
+    public function shouldRequestBeMarkedAsCached(RequestInterface $request): bool
+    {
+        return false;
     }
 }

@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace B13\Proxycachemanager\ResourceStorageOperations;
 
 /*
@@ -17,22 +18,19 @@ namespace B13\Proxycachemanager\ResourceStorageOperations;
  */
 
 use B13\Proxycachemanager\Provider\ProxyProviderInterface;
+use B13\Proxycachemanager\ProxyConfiguration;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Resource\Folder;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Site\SiteFinder;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class CacheService implements SingletonInterface
 {
-    /**
-     * @var SiteFinder
-     */
-    protected $siteFinder;
+    protected ProxyProviderInterface $proxyProvider;
 
-    public function __construct(SiteFinder $siteFinder)
+    public function __construct(protected SiteFinder $siteFinder, ProxyConfiguration $configuration)
     {
-        $this->siteFinder = $siteFinder;
+        $this->proxyProvider = $configuration->getProxyProvider();
     }
 
     public function flushCachesForFile(FileInterface $file): void
@@ -55,25 +53,11 @@ class CacheService implements SingletonInterface
         return $urls;
     }
 
-    protected function proxyProviderEnabled(): bool
-    {
-        return !empty($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['tx_proxy']['options']['reverseProxyProvider']);
-    }
-
-    protected function getProxyProvider(): ProxyProviderInterface
-    {
-        /** var ProxyProviderInterface */
-        return GeneralUtility::makeInstance(
-            $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['tx_proxy']['options']['reverseProxyProvider']
-        );
-    }
-
     protected function flushCaches(array $publicUrls): void
     {
-        if (!$this->proxyProviderEnabled()) {
+        if (!$this->proxyProvider->isActive()) {
             return;
         }
-        $proxyProvider = $this->getProxyProvider();
         $urls = [];
         $sites = $this->siteFinder->getAllSites();
         foreach ($sites as $site) {
@@ -82,7 +66,7 @@ class CacheService implements SingletonInterface
             }
         }
         if (!empty($urls)) {
-            $proxyProvider->flushCacheForUrls($urls);
+            $this->proxyProvider->flushCacheForUrls($urls);
         }
     }
 }

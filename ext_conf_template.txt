@@ -1,8 +1,5 @@
-# cat=proxy; type=options[Varnish via Curl/HTTP=B13\Proxycachemanager\Provider\VarnishHttpProxyProvider,Cloudflare/HTTP=B13\Proxycachemanager\Provider\CloudflareProxyProvider,Fastly/HTTP=B13\Proxycachemanager\Provider\FastlyProxyProvider,Nginx via Curl/HTTP=B13\Proxycachemanager\Provider\CurlHttpProxyProvider]; label=Choose the reverse proxy:Select the proxy in use and its provider to connect to the provider
-reverseProxyProvider = B13\Proxycachemanager\Provider\VarnishHttpProxyProvider
-
-# cat=proxy; label=Define the IP/hostname of the reverse proxy:Use multiple hosts as a comma-separated list, also, you can use these variables ({scheme}, {host}, {port}, {user}, {pass}, {path}, {query}, {fragment}, {url}) to make PURGE calls dynamically. Useful for nginx. Usually http://127.0.0.1:8023/{path} should do the trick
-reverseProxyEndpoints = http://{host}/purge/{path}
+# cat=proxy; type=string; label=Set the reverse proxy:Set the proxy in use and its provider to connect to the provider
+reverseProxyProvider =
 
 # cat=basic//; type=boolean; label=Enable Backend module
-showBackendModule = 1
+showBackendModule = 0

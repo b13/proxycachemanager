@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace B13\Proxycachemanager\Cache\Backend;
 
 /*
@@ -29,45 +30,11 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class ReverseProxyCacheBackend extends Typo3DatabaseBackend implements TransientBackendInterface
 {
-    /**
-     * @var ProxyProviderInterface
-     */
-    protected $reverseProxyProvider;
+    protected ProxyProviderInterface $reverseProxyProvider;
 
-    /**
-     * set from the AbstractCacheBackend when the object is instantiated.
-     *
-     * @param string $className
-     */
-    public function setReverseProxyProvider(string $className)
+    public function setReverseProxyProvider(ProxyProviderInterface $reverseProxyProvider)
     {
-        if (empty($className)) {
-            throw new \InvalidArgumentException('Invalid cache proxy provider for Reverse Proxy Cache', 1231267264);
-        }
-        try {
-            $this->reverseProxyProvider = GeneralUtility::makeInstance($className);
-        } catch (\Exception $e) {
-            throw new \InvalidArgumentException(
-                'Invalid cache proxy provider class for Reverse Proxy Cache - Class "' . $className . '" not found.',
-                1231267264
-            );
-        }
-    }
-
-    /**
-     * set the hostnames of the reverse proxies
-     * set from the AbstractCacheBackend when the object is instantiated.
-     *
-     * @param string $endpoints
-     */
-    public function setReverseProxyEndpoints($endpoints = null)
-    {
-        // assume it the reverse proxy is on the same host
-        if (empty($endpoints)) {
-            $endpoints = GeneralUtility::getIndpEnv('HTTP_HOST');
-        }
-        $endpoints = GeneralUtility::trimExplode(',', $endpoints);
-        $this->reverseProxyProvider->setProxyEndpoints($endpoints);
+        $this->reverseProxyProvider = $reverseProxyProvider;
     }
 
     /**
@@ -95,11 +62,13 @@ class ReverseProxyCacheBackend extends Typo3DatabaseBackend implements Transient
      */
     public function flush()
     {
-        $urls = $this->getAllCachedUrls();
         parent::flush();
 
         // make the HTTP Purge call
-        $this->reverseProxyProvider->flushAllUrls($urls);
+        if ($this->reverseProxyProvider->isActive()) {
+            $urls = $this->getAllCachedUrls();
+            $this->reverseProxyProvider->flushAllUrls($urls);
+        }
     }
 
     /**
@@ -109,11 +78,13 @@ class ReverseProxyCacheBackend extends Typo3DatabaseBackend implements Transient
      */
     public function flushByTag($tag)
     {
-        $identifiers = $this->findIdentifiersByTag($tag);
-        foreach ($identifiers as $entryIdentifier) {
-            $url = $this->get($entryIdentifier);
-            if ($url) {
-                $this->reverseProxyProvider->flushCacheForUrl($url);
+        if ($this->reverseProxyProvider->isActive()) {
+            $identifiers = $this->findIdentifiersByTag($tag);
+            foreach ($identifiers as $entryIdentifier) {
+                $url = $this->get($entryIdentifier);
+                if ($url) {
+                    $this->reverseProxyProvider->flushCacheForUrls([$url]);
+                }
             }
         }
 
@@ -127,19 +98,21 @@ class ReverseProxyCacheBackend extends Typo3DatabaseBackend implements Transient
      */
     public function flushByTags(array $tags)
     {
-        $identifiers = [];
-        foreach ($tags as $tag) {
-            $identifiers = array_merge($identifiers, $this->findIdentifiersByTag($tag));
-        }
-        $identifiers = array_unique($identifiers);
+        if ($this->reverseProxyProvider->isActive()) {
+            $identifiers = [];
+            foreach ($tags as $tag) {
+                $identifiers = array_merge($identifiers, $this->findIdentifiersByTag($tag));
+            }
+            $identifiers = array_unique($identifiers);
 
-        $urls = [];
-        foreach ($identifiers as $entryIdentifier) {
-            $urls[] = $this->get($entryIdentifier);
-        }
-        $urls = array_unique($urls);
+            $urls = [];
+            foreach ($identifiers as $entryIdentifier) {
+                $urls[] = $this->get($entryIdentifier);
+            }
+            $urls = array_unique($urls);
 
-        $this->reverseProxyProvider->flushCacheForUrls($urls);
+            $this->reverseProxyProvider->flushCacheForUrls($urls);
+        }
 
         parent::flushByTags($tags);
     }
@@ -147,12 +120,12 @@ class ReverseProxyCacheBackend extends Typo3DatabaseBackend implements Transient
     /**
      * Fetch all URLs in the cache.
      */
-    public function getAllCachedUrls()
+    protected function getAllCachedUrls(): array
     {
         $urls = [];
         $conn = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable($this->cacheTable);
         $stmt = $conn->select(['content'], $this->cacheTable);
-        while ($url = $stmt->fetchOne(0)) {
+        while ($url = $stmt->fetchOne()) {
             $urls[] = $url;
         }
         return $urls;

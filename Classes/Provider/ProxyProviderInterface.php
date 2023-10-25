@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace B13\Proxycachemanager\Provider;
 
 /*
@@ -16,36 +17,15 @@ namespace B13\Proxycachemanager\Provider;
  * The TYPO3 project - inspiring people to share!
  */
 
+use Psr\Http\Message\RequestInterface;
+
 /**
  * The interface to be called from the CacheBackend.
  */
 interface ProxyProviderInterface
 {
-    /**
-     * Sets the proxy endpoints.
-     *
-     * @param array $endpoints
-     */
-    public function setProxyEndpoints($endpoints);
-
-    /**
-     * flushes the proxy cache for a single URL.
-     *
-     * @param string $url
-     */
-    public function flushCacheForUrl($url);
-
-    /**
-     * Flushes multiple urls from the proxy cache
-     *
-     * @param array $urls
-     */
-    public function flushCacheForUrls(array $urls);
-
-    /**
-     * Flushes the whole proxy cache.
-     *
-     * @param array $urls
-     */
-    public function flushAllUrls($urls = []);
+    public function flushCacheForUrls(array $urls): void;
+    public function flushAllUrls(array $urls = []): void;
+    public function isActive(): bool;
+    public function shouldRequestBeMarkedAsCached(RequestInterface $request): bool;
 }

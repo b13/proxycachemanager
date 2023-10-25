@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace B13\Proxycachemanager\Controller;
 
 /*
@@ -17,96 +18,75 @@ namespace B13\Proxycachemanager\Controller;
  */
 
 use B13\Proxycachemanager\Provider\ProxyProviderInterface;
-use GuzzleHttp\Exception\TransferException;
-use TYPO3\CMS\Backend\View\BackendTemplateView;
+use B13\Proxycachemanager\ProxyConfiguration;
+use Psr\Http\Message\ResponseInterface;
+use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Core\Cache\CacheManager;
-use TYPO3\CMS\Core\Core\Environment;
+use TYPO3\CMS\Core\Http\RedirectResponse;
+use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 
-/**
- * Backend
- */
 class ManagementController extends ActionController
 {
-    protected $defaultViewObjectName = BackendTemplateView::class;
+    protected ProxyProviderInterface $proxyProvider;
 
-    /**
-     * @var BackendTemplateView
-     */
-    protected $view;
-
-    public function indexAction()
+    public function __construct(protected ModuleTemplateFactory $moduleTemplateFactory, ProxyConfiguration $configuration)
     {
+        $this->proxyProvider = $configuration->getProxyProvider();
+    }
+
+    public function indexAction(): ResponseInterface
+    {
+        $moduleTemplate = $this->moduleTemplateFactory->create($this->request);
+        $moduleTemplate->setContent($this->view->render());
+        return $this->htmlResponse($moduleTemplate->renderContent());
     }
 
     /**
      * @param string $tag
      */
-    public function clearTagAction(string $tag)
+    public function clearTagAction(string $tag): ResponseInterface
     {
         GeneralUtility::makeInstance(CacheManager::class)->flushCachesByTags([htmlspecialchars($tag)]);
         $this->addFlashMessage(
             'Successfully purged cache tag "' . htmlspecialchars($tag) . '".',
             'Cache flushed',
-            FlashMessage::OK
+            AbstractMessage::OK
         );
-        $this->redirect('index');
+        return new RedirectResponse($this->uriBuilder->reset()->uriFor('index'));
     }
 
     /**
      * @param string $url
      */
-    public function purgeUrlAction(string $url)
+    public function purgeUrlAction(string $url): ResponseInterface
     {
         if (empty($url)) {
-            $this->redirect('index');
+            $this->addFlashMessage(
+                'Please specify url',
+                'Cache not flushed',
+                AbstractMessage::WARNING
+            );
+            return new RedirectResponse($this->uriBuilder->reset()->uriFor('index'));
         }
         $url = htmlspecialchars($url);
-        if (!isset($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['proxycachemanager']['reverseProxyProvider'])) {
+        if (!$this->proxyProvider->isActive()) {
             $this->addFlashMessage(
-                'Attempting to purge URL "' . $url . '". No matching provider configured.',
+                'Attempting to purge URL "' . $url . '". No active provider configured.',
                 'Cache not flushed',
-                FlashMessage::ERROR
+                AbstractMessage::ERROR
             );
-            $this->redirect('index');
+            return new RedirectResponse($this->uriBuilder->reset()->uriFor('index'));
         }
 
-        $proxyProvider = GeneralUtility::makeInstance($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['proxycachemanager']['reverseProxyProvider']);
-        if (!$proxyProvider instanceof ProxyProviderInterface) {
-            $this->addFlashMessage(
-                'Attempting to purge URL "' . $url . '". No matching provider configured.',
-                'Cache not flushed',
-                FlashMessage::ERROR
-            );
-            $this->redirect('index');
-        }
-
-        if (Environment::getContext()->isProduction()) {
-            try {
-                $proxyProvider->flushCacheForUrl($url);
-                $this->addFlashMessage(
-                    'Successfully purged URL "' . $url . '".',
-                    'Cache flushed',
-                    FlashMessage::OK
-                );
-            } catch (TransferException $e) {
-                $this->addFlashMessage(
-                    sprintf('URL "%s" could not be purged. The technical reason was "%s".', $url, htmlspecialchars($e->getMessage())),
-                    'Cache not flushed',
-                    FlashMessage::ERROR
-                );
-            }
-        }
-
-        if (Environment::getContext()->isDevelopment()) {
-            $this->addFlashMessage(
-                'Attempting to purge URL "' . $url . '". Feature is disabled in Development.',
-                'Cache not flushed',
-                FlashMessage::WARNING
-            );
-        }
-        $this->redirect('index');
+        $this->proxyProvider->flushCacheForUrls([$url]);
+        $this->addFlashMessage(
+            'Successfully purged URL "' . $url . '".',
+            'Cache flushed',
+            FlashMessage::OK
+        );
+        return new RedirectResponse($this->uriBuilder->reset()->uriFor('index'));
     }
 }
