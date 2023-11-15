@@ -59,14 +59,27 @@ class CacheService implements SingletonInterface
             return;
         }
         $urls = [];
-        $sites = $this->siteFinder->getAllSites();
-        foreach ($sites as $site) {
+        $baseUrls = $this->collectAllPossibleBaseUrls();
+        foreach ($baseUrls as $baseUrl) {
             foreach ($publicUrls as $publicUrl) {
-                $urls[] = rtrim($site->getBase()->__toString(), '/') . '/' . ltrim($publicUrl, '/');
+                $urls[] = $baseUrl . '/' . ltrim($publicUrl, '/');
             }
         }
         if (!empty($urls)) {
             $this->proxyProvider->flushCacheForUrls($urls);
         }
+    }
+
+    protected function collectAllPossibleBaseUrls(): array
+    {
+        $baseUrls = [];
+        $sites = $this->siteFinder->getAllSites();
+        foreach ($sites as $site) {
+            $baseUrls[] = $site->getBase()->getScheme() . '://' . $site->getBase()->getHost();
+            foreach ($site->getLanguages() as $siteLanguage) {
+                $baseUrls = $siteLanguage->getBase()->getScheme() . '://' . $siteLanguage->getBase()->getHost();
+            }
+        }
+        return array_unique($baseUrls);
     }
 }
