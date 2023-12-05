@@ -77,7 +77,7 @@ class CacheService implements SingletonInterface
         foreach ($sites as $site) {
             $baseUrls[] = $site->getBase()->getScheme() . '://' . $site->getBase()->getHost();
             foreach ($site->getLanguages() as $siteLanguage) {
-                $baseUrls = $siteLanguage->getBase()->getScheme() . '://' . $siteLanguage->getBase()->getHost();
+                $baseUrls[] = $siteLanguage->getBase()->getScheme() . '://' . $siteLanguage->getBase()->getHost();
             }
         }
         return array_unique($baseUrls);
