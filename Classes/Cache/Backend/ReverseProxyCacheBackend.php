@@ -32,9 +32,19 @@ class ReverseProxyCacheBackend extends Typo3DatabaseBackend implements Transient
 {
     protected ProxyProviderInterface $reverseProxyProvider;
 
-    public function setReverseProxyProvider(ProxyProviderInterface $reverseProxyProvider)
+    public function setReverseProxyProvider(string $className)
     {
-        $this->reverseProxyProvider = $reverseProxyProvider;
+        if (empty($className)) {
+            throw new \InvalidArgumentException('Invalid cache proxy provider for Reverse Proxy Cache', 1231267264);
+        }
+        try {
+            $this->reverseProxyProvider = GeneralUtility::makeInstance($className);
+        } catch (\Exception $e) {
+            throw new \InvalidArgumentException(
+                'Invalid cache proxy provider class for Reverse Proxy Cache - Class "' . $className . '" not found.',
+                1231267264
+            );
+        }
     }
 
     /**
