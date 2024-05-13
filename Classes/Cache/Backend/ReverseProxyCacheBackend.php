@@ -62,13 +62,12 @@ class ReverseProxyCacheBackend extends Typo3DatabaseBackend implements Transient
      */
     public function flush()
     {
-        parent::flush();
-
         // make the HTTP Purge call
         if ($this->reverseProxyProvider->isActive()) {
             $urls = $this->getAllCachedUrls();
             $this->reverseProxyProvider->flushAllUrls($urls);
         }
+        parent::flush();
     }
 
     /**
