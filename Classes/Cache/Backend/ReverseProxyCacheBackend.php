@@ -18,6 +18,7 @@ namespace B13\Proxycachemanager\Cache\Backend;
  */
 
 use B13\Proxycachemanager\Provider\ProxyProviderInterface;
+use Psr\Log\LoggerAwareTrait;
 use TYPO3\CMS\Core\Cache\Backend\TransientBackendInterface;
 use TYPO3\CMS\Core\Cache\Backend\Typo3DatabaseBackend;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -30,6 +31,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class ReverseProxyCacheBackend extends Typo3DatabaseBackend implements TransientBackendInterface
 {
+    use LoggerAwareTrait;
     protected ProxyProviderInterface $reverseProxyProvider;
 
     public function setReverseProxyProvider(ProxyProviderInterface $reverseProxyProvider)
@@ -113,7 +115,11 @@ class ReverseProxyCacheBackend extends Typo3DatabaseBackend implements Transient
             $this->reverseProxyProvider->flushCacheForUrls($urls);
         }
 
-        parent::flushByTags($tags);
+        try {
+            parent::flushByTags($tags);
+        } catch (\Throwable $e) {
+            $this->logger->error('Failed to flush ' . count($tags) . ' tags. SQL query limit exceeded. See the list of all tags ' . implode(', ', $tags));
+        }
     }
 
     /**
