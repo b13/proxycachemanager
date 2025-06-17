@@ -3,9 +3,13 @@
 defined('TYPO3') or die();
 
 use B13\Proxycachemanager\ProxyConfiguration;
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-if ((GeneralUtility::makeInstance(ProxyConfiguration::class))->showBackendModule()) {
+if (
+    (GeneralUtility::makeInstance(Typo3Version::class))->getMajorVersion() < 12 &&
+    (GeneralUtility::makeInstance(ProxyConfiguration::class))->showBackendModule()
+) {
     \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerModule(
         'proxycachemanager',
         'site',

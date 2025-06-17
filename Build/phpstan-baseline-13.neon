@@ -1,0 +1,31 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Access to undefined constant TYPO3\\\\CMS\\\\Core\\\\Messaging\\\\AbstractMessage\\:\\:ERROR\\.$#"
+			count: 1
+			path: ../Classes/Controller/ManagementController.php
+
+		-
+			message: "#^Access to undefined constant TYPO3\\\\CMS\\\\Core\\\\Messaging\\\\AbstractMessage\\:\\:OK\\.$#"
+			count: 2
+			path: ../Classes/Controller/ManagementController.php
+
+		-
+			message: "#^Access to undefined constant TYPO3\\\\CMS\\\\Core\\\\Messaging\\\\AbstractMessage\\:\\:WARNING\\.$#"
+			count: 2
+			path: ../Classes/Controller/ManagementController.php
+
+		-
+			message: "#^Call to an undefined method TYPO3\\\\CMS\\\\Backend\\\\Template\\\\ModuleTemplate\\:\\:renderContent\\(\\)\\.$#"
+			count: 1
+			path: ../Classes/Controller/ManagementController.php
+
+		-
+			message: "#^Call to an undefined method TYPO3\\\\CMS\\\\Backend\\\\Template\\\\ModuleTemplate\\:\\:setContent\\(\\)\\.$#"
+			count: 1
+			path: ../Classes/Controller/ManagementController.php
+
+		-
+			message: "#^Call to an undefined method TYPO3\\\\CMS\\\\Core\\\\View\\\\ViewInterface\\|TYPO3Fluid\\\\Fluid\\\\View\\\\ViewInterface\\:\\:setTemplateRootPaths\\(\\)\\.$#"
+			count: 1
+			path: ../Classes/Controller/ManagementController.php

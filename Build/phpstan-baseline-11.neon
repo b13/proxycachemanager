@@ -1,0 +1,26 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Access to constant ERROR on an unknown class TYPO3\\\\CMS\\\\Core\\\\Type\\\\ContextualFeedbackSeverity\\.$#"
+			count: 1
+			path: ../Classes/Controller/ManagementController.php
+
+		-
+			message: "#^Access to constant OK on an unknown class TYPO3\\\\CMS\\\\Core\\\\Type\\\\ContextualFeedbackSeverity\\.$#"
+			count: 2
+			path: ../Classes/Controller/ManagementController.php
+
+		-
+			message: "#^Access to constant WARNING on an unknown class TYPO3\\\\CMS\\\\Core\\\\Type\\\\ContextualFeedbackSeverity\\.$#"
+			count: 1
+			path: ../Classes/Controller/ManagementController.php
+
+		-
+			message: "#^Call to an undefined method TYPO3\\\\CMS\\\\Backend\\\\Template\\\\ModuleTemplate\\:\\:renderResponse\\(\\)\\.$#"
+			count: 1
+			path: ../Classes/Controller/ManagementController.php
+
+		-
+			message: "#^Call to an undefined method TYPO3\\\\CMS\\\\Extbase\\\\Mvc\\\\View\\\\ViewInterface\\:\\:setTemplateRootPaths\\(\\)\\.$#"
+			count: 1
+			path: ../Classes/Controller/ManagementController.php

@@ -1,3 +1,5 @@
+includes:
+  - phpstan-baseline-11.neon
 parameters:
   level: 5
 

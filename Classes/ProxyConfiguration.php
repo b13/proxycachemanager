@@ -33,7 +33,7 @@ class ProxyConfiguration
     {
         if ($this->proxyProvider === null) {
             $configuration = (GeneralUtility::makeInstance(ExtensionConfiguration::class))->get('proxycachemanager');
-            if (isset($configuration['reverseProxyProvider'])) {
+            if (!empty($configuration['reverseProxyProvider'])) {
                 if (!class_exists($configuration['reverseProxyProvider'])) {
                     throw new \InvalidArgumentException('no such class ' . $configuration['reverseProxyProvider'], 1692699940);
                 }
