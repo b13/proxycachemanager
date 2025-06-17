@@ -30,8 +30,8 @@
 		"typo3/cms-frontend": "^11.5 || ^12.4 || ^13.4"
 	},
 	"require-dev": {
-		"saschaegerer/phpstan-typo3": "^1.8",
-		"typo3/coding-standards": "^0.7",
+		"saschaegerer/phpstan-typo3": "^1.10",
+		"typo3/coding-standards": "^0.7 || ^0.8",
 		"typo3/tailor": "^1.0"
 	},
 	"extra": {

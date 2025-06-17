@@ -23,8 +23,9 @@ use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Http\RedirectResponse;
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
-use TYPO3\CMS\Core\Messaging\FlashMessage;
+use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 
@@ -40,8 +41,14 @@ class ManagementController extends ActionController
     public function indexAction(): ResponseInterface
     {
         $moduleTemplate = $this->moduleTemplateFactory->create($this->request);
-        $moduleTemplate->setContent($this->view->render());
-        return $this->htmlResponse($moduleTemplate->renderContent());
+        if ((GeneralUtility::makeInstance(Typo3Version::class))->getMajorVersion() === 11) {
+            $this->view->setTemplateRootPaths(['EXT:proxycachemanager/Resources/Private/TemplatesV11/']);
+            $moduleTemplate->setContent($this->view->render());
+            $response = $this->htmlResponse($moduleTemplate->renderContent());
+        } else {
+            $response = $moduleTemplate->renderResponse('Management/Index');
+        }
+        return $response;
     }
 
     /**
@@ -50,10 +57,15 @@ class ManagementController extends ActionController
     public function clearTagAction(string $tag): ResponseInterface
     {
         GeneralUtility::makeInstance(CacheManager::class)->flushCachesByTags([htmlspecialchars($tag)]);
+        if ((GeneralUtility::makeInstance(Typo3Version::class))->getMajorVersion() === 11) {
+            $severity = AbstractMessage::OK;
+        } else {
+            $severity = ContextualFeedbackSeverity::OK;
+        }
         $this->addFlashMessage(
             'Successfully purged cache tag "' . htmlspecialchars($tag) . '".',
             'Cache flushed',
-            AbstractMessage::OK
+            $severity
         );
         return new RedirectResponse($this->uriBuilder->reset()->uriFor('index'));
     }
@@ -64,6 +76,11 @@ class ManagementController extends ActionController
     public function purgeUrlAction(string $url): ResponseInterface
     {
         if (empty($url)) {
+            if ((GeneralUtility::makeInstance(Typo3Version::class))->getMajorVersion() === 11) {
+                $severity = AbstractMessage::WARNING;
+            } else {
+                $severity = ContextualFeedbackSeverity::WARNING;
+            }
             $this->addFlashMessage(
                 'Please specify url',
                 'Cache not flushed',
@@ -73,19 +90,29 @@ class ManagementController extends ActionController
         }
         $url = htmlspecialchars($url);
         if (!$this->proxyProvider->isActive()) {
+            if ((GeneralUtility::makeInstance(Typo3Version::class))->getMajorVersion() === 11) {
+                $severity = AbstractMessage::ERROR;
+            } else {
+                $severity = ContextualFeedbackSeverity::ERROR;
+            }
             $this->addFlashMessage(
                 'Attempting to purge URL "' . $url . '". No active provider configured.',
                 'Cache not flushed',
-                AbstractMessage::ERROR
+                $severity
             );
             return new RedirectResponse($this->uriBuilder->reset()->uriFor('index'));
         }
 
         $this->proxyProvider->flushCacheForUrls([$url]);
+        if ((GeneralUtility::makeInstance(Typo3Version::class))->getMajorVersion() === 11) {
+            $severity = AbstractMessage::OK;
+        } else {
+            $severity = ContextualFeedbackSeverity::OK;
+        }
         $this->addFlashMessage(
             'Successfully purged URL "' . $url . '".',
             'Cache flushed',
-            FlashMessage::OK
+            $severity
         );
         return new RedirectResponse($this->uriBuilder->reset()->uriFor('index'));
     }
