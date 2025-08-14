@@ -41,7 +41,7 @@ class ModifyClearCacheActions
                 'id' => 'clearProxyCache',
                 'title' => 'LLL:EXT:proxycachemanager/Resources/Private/Language/locallang.xlf:menuitem.title',
                 'description' => 'LLL:EXT:proxycachemanager/Resources/Private/Language/locallang.xlf:menuitem.description',
-                'href' => $uriBuilder->buildUriFromRoute('ajax_proxy_flushcaches'),
+                'href' => (string)$uriBuilder->buildUriFromRoute('ajax_proxy_flushcaches'),
                 'iconIdentifier' => 'actions-system-cache-clear-impact-medium',
             ];
             $event->addCacheAction($item);
