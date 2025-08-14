@@ -51,6 +51,7 @@ jobs:
       - name: Phpstan 13
         if: matrix.TYPO3 == '13'
         run: .Build/bin/phpstan analyze -c Build/phpstan13.neon
-      - name: Phpcsfix
+      - name: Phpcsfix TYPO3 12 and 13
+        if: matrix.TYPO3 != '11'
         run: .Build/bin/php-cs-fixer fix --config=Build/php-cs-fixer.php --dry-run --stop-on-violation --using-cache=no
 
