@@ -84,7 +84,7 @@ class ManagementController extends ActionController
             $this->addFlashMessage(
                 'Please specify url',
                 'Cache not flushed',
-                AbstractMessage::WARNING
+                $severity
             );
             return new RedirectResponse($this->uriBuilder->reset()->uriFor('index'));
         }
