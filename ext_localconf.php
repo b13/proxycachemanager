@@ -17,8 +17,3 @@ if (empty($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['
         'groups' => ['pages', 'proxy'],
     ];
 }
-
-// Hook for adding any cacheable frontend URL to our proxy cache
-// v11 only
-$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['tslib/class.tslib_fe.php']['insertPageIncache']['tx_proxycachemanager'] =
-    \B13\Proxycachemanager\Hook\FrontendHook::class;
