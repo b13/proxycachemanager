@@ -1,5 +1,40 @@
 # Upgrade Instructions
 
+v4 => v5
+
+Proxycachemanager v5 drops support for TYPO3 v11 and v12. The minimum
+supported version is now TYPO3 v13 LTS; v14 is fully supported.
+
+## Removed
+
+* `Classes/Hook/FrontendHook.php` — the v11-only `tslib/class.tslib_fe.php`
+  `insertPageIncache` hook. Cache writes are handled exclusively via the
+  `AfterCachedPageIsPersistedEvent` listener now.
+* `Resources/Private/TemplatesV11/` — fallback Fluid template for the v11
+  backend module.
+* `ext_tables.php` — v11-only `ExtensionUtility::registerModule()` call.
+  The module is registered through `Configuration/Backend/Modules.php` on
+  v12 and up.
+
+## Changed
+
+* `Classes/Listener/AfterCacheIsPersisted` no longer calls
+  `$event->getController()->getPageCacheTags()` — TYPO3 v14 dropped the
+  `controller` argument from `AfterCachedPageIsPersistedEvent`. Cache tags
+  are now read from `$event->getCacheData()['cacheTags']`, which TYPO3
+  populates in both v13 and v14.
+* `Classes/Controller/ManagementController` no longer branches on the
+  TYPO3 major version. `\TYPO3\CMS\Core\Messaging\AbstractMessage::OK`,
+  `::WARNING`, `::ERROR` were removed in TYPO3 v14; the controller now
+  always uses `ContextualFeedbackSeverity::*` enum cases.
+
+## Required platform
+
+* PHP 8.2+
+* TYPO3 13.4+ or 14.x
+
+---
+
 v3 => v4
 
 Proxycachemanager v3 served for many years as a well thought out basis

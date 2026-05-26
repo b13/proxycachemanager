@@ -36,7 +36,7 @@ class AfterCacheIsPersisted
         if (!$this->proxyProvider->isActive()) {
             return;
         }
-        $cacheTags = $event->getController()->getPageCacheTags();
+        $cacheTags = $event->getCacheData()['cacheTags'] ?? [];
         $url = (string)$event->getRequest()->getUri();
         $this->cache->set(md5($url), $url, $cacheTags, $event->getCacheLifetime());
     }
