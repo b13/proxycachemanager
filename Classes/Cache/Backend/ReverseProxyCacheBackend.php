@@ -40,29 +40,10 @@ class ReverseProxyCacheBackend extends Typo3DatabaseBackend implements Transient
     }
 
     /**
-     * Removes all cache entries matching the specified identifier.
-     * Usually this only affects one entry.
-     *
-     * Please note: As remove() is called when using set() in the parent method,
-     * it would also flush the cache when the FE is accessed, resulting in a lot of
-     * cache entries. This should be avoided, for this reason, we do not call the
-     * provider anymore. Ideally we should not invalidate but rather push this actively
-     * to the proxy in the future.
-     *
-     * @param string $entryIdentifier Specifies the cache entry to remove
-     *
-     * @return bool TRUE if (at least) an entry could be removed or FALSE if no entry was found
-     */
-    public function remove($entryIdentifier)
-    {
-        return parent::remove($entryIdentifier);
-    }
-
-    /**
      * Removes all cache entries of this cache.
      * Also let the proxy provider know to clear everything as well.
      */
-    public function flush()
+    public function flush(): void
     {
         // make the HTTP Purge call
         if ($this->reverseProxyProvider->isActive()) {
@@ -77,7 +58,7 @@ class ReverseProxyCacheBackend extends Typo3DatabaseBackend implements Transient
      *
      * @param string $tag The tag the entries must have
      */
-    public function flushByTag($tag)
+    public function flushByTag($tag): void
     {
         if ($this->reverseProxyProvider->isActive()) {
             $identifiers = $this->findIdentifiersByTag($tag);
@@ -97,7 +78,7 @@ class ReverseProxyCacheBackend extends Typo3DatabaseBackend implements Transient
      *
      * @param string[] $tags
      */
-    public function flushByTags(array $tags)
+    public function flushByTags(array $tags): void
     {
         if ($this->reverseProxyProvider->isActive()) {
             $identifiers = [];
