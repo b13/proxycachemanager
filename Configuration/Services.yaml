@@ -26,10 +26,6 @@ services:
         identifier: 'b13-proxycachemanager-afterCacheIsPersisted'
     arguments:
       $cache: '@cache.tx_proxy'
-  B13\Proxycachemanager\Hook\FrontendHook:
-    public: true
-    arguments:
-      $cache: '@cache.tx_proxy'
 
   B13\Proxycachemanager\ResourceStorageOperations\:
     resource: '../Classes/ResourceStorageOperations/*'
