@@ -19,7 +19,6 @@ namespace B13\Proxycachemanager\Cache\Backend;
 
 use B13\Proxycachemanager\Provider\ProxyProviderInterface;
 use Psr\Log\LoggerAwareTrait;
-use TYPO3\CMS\Core\Cache\Backend\TransientBackendInterface;
 use TYPO3\CMS\Core\Cache\Backend\Typo3DatabaseBackend;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -29,7 +28,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * when removing or flushing, additionally does a HTTP Request
  * of course "setting" works naturally in am already working reverse proxy environment.
  */
-class ReverseProxyCacheBackend extends Typo3DatabaseBackend implements TransientBackendInterface
+class ReverseProxyCacheBackend extends Typo3DatabaseBackend
 {
     use LoggerAwareTrait;
     protected ProxyProviderInterface $reverseProxyProvider;
