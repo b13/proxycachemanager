@@ -21,6 +21,7 @@ use B13\Proxycachemanager\Provider\ProxyProviderInterface;
 use B13\Proxycachemanager\ProxyConfiguration;
 use TYPO3\CMS\Backend\Backend\Event\ModifyClearCacheActionsEvent;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class ModifyClearCacheActions
@@ -41,9 +42,12 @@ class ModifyClearCacheActions
                 'id' => 'clearProxyCache',
                 'title' => 'LLL:EXT:proxycachemanager/Resources/Private/Language/locallang.xlf:menuitem.title',
                 'description' => 'LLL:EXT:proxycachemanager/Resources/Private/Language/locallang.xlf:menuitem.description',
-                'href' => (string)$uriBuilder->buildUriFromRoute('ajax_proxy_flushcaches'),
+                'endpoint' => (string)$uriBuilder->buildUriFromRoute('ajax_proxy_flushcaches'),
                 'iconIdentifier' => 'actions-system-cache-clear-impact-medium',
             ];
+            if ((new Typo3Version())->getMajorVersion() < 14) {
+                $item['href'] = $item['endpoint'];
+            }
             $event->addCacheAction($item);
         }
     }
