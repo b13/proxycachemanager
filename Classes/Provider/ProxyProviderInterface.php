@@ -17,7 +17,7 @@ namespace B13\Proxycachemanager\Provider;
  * The TYPO3 project - inspiring people to share!
  */
 
-use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * The interface to be called from the CacheBackend.
@@ -27,5 +27,5 @@ interface ProxyProviderInterface
     public function flushCacheForUrls(array $urls): void;
     public function flushAllUrls(array $urls = []): void;
     public function isActive(): bool;
-    public function shouldRequestBeMarkedAsCached(RequestInterface $request): bool;
+    public function shouldRequestBeMarkedAsCached(ServerRequestInterface $request): bool;
 }

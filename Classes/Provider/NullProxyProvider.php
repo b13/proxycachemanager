@@ -17,7 +17,7 @@ namespace B13\Proxycachemanager\Provider;
  * The TYPO3 project - inspiring people to share!
  */
 
-use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class NullProxyProvider implements ProxyProviderInterface
 {
@@ -30,7 +30,7 @@ class NullProxyProvider implements ProxyProviderInterface
         return false;
     }
 
-    public function shouldRequestBeMarkedAsCached(RequestInterface $request): bool
+    public function shouldRequestBeMarkedAsCached(ServerRequestInterface $request): bool
     {
         return false;
     }
