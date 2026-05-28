@@ -39,4 +39,9 @@ jobs:
         run: .Build/bin/phpstan analyze -c Build/phpstan.neon
       - name: Phpcsfix
         run: .Build/bin/php-cs-fixer fix --config=Build/php-cs-fixer.php --dry-run --stop-on-violation --using-cache=no
-
+      - name: Archive composer.lock
+        uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: composer.lock-${{ matrix.php }}-${{ matrix.TYPO3 }}
+          path: composer.lock
