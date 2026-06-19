@@ -62,8 +62,8 @@ class ReverseProxyCacheBackend extends Typo3DatabaseBackend
         if ($this->reverseProxyProvider->isActive()) {
             $identifiers = $this->findIdentifiersByTag($tag);
             foreach ($identifiers as $entryIdentifier) {
-                $url = $this->get($entryIdentifier);
-                if ($url) {
+                $url = $this->resolveCachedUrl($entryIdentifier);
+                if ($url !== null) {
                     $this->reverseProxyProvider->flushCacheForUrls([$url]);
                 }
             }
@@ -88,11 +88,16 @@ class ReverseProxyCacheBackend extends Typo3DatabaseBackend
 
             $urls = [];
             foreach ($identifiers as $entryIdentifier) {
-                $urls[] = $this->get($entryIdentifier);
+                $url = $this->resolveCachedUrl($entryIdentifier);
+                if ($url !== null) {
+                    $urls[] = $url;
+                }
             }
             $urls = array_unique($urls);
 
-            $this->reverseProxyProvider->flushCacheForUrls($urls);
+            if ($urls !== []) {
+                $this->reverseProxyProvider->flushCacheForUrls($urls);
+            }
         }
 
         try {
@@ -109,10 +114,44 @@ class ReverseProxyCacheBackend extends Typo3DatabaseBackend
     {
         $urls = [];
         $conn = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable($this->cacheTable);
-        $stmt = $conn->select(['content'], $this->cacheTable);
-        while ($url = $stmt->fetchOne()) {
-            $urls[] = $url;
+        $rows = $conn->select(['identifier', 'content'], $this->cacheTable)->fetchAllAssociative();
+        foreach ($rows as $row) {
+            $url = $this->resolveCachedUrl((string)$row['identifier'], $row['content']);
+            if ($url !== null) {
+                $urls[] = $url;
+            }
         }
-        return $urls;
+        return array_values(array_unique($urls));
+    }
+
+    /**
+     * Resolves the plain page URL stored for a cache entry.
+     *
+     * Since the backend no longer implements TransientBackendInterface (the v14
+     * contract is incompatible with Typo3DatabaseBackend), the configured
+     * VariableFrontend serializes — and on v13.4+ HMAC-signs — every entry before
+     * it is written to the database. Reads must therefore go through the frontend
+     * to obtain the original URL again; a raw column read would only yield the
+     * serialized blob.
+     *
+     * Rows written by older versions (TransientBackendInterface era) still hold the
+     * plain URL and fail deserialization, so we fall back to the raw value for those.
+     */
+    protected function resolveCachedUrl(string $entryIdentifier, ?string $rawContent = null): ?string
+    {
+        $url = $this->cache->get($entryIdentifier);
+        if (is_string($url) && $url !== '') {
+            return $url;
+        }
+
+        // Legacy fallback: rows from < 5.0.0 stored the plain URL directly.
+        if ($rawContent === null) {
+            $rawContent = (string)$this->get($entryIdentifier);
+        }
+        if (preg_match('#^https?://#', $rawContent)) {
+            return $rawContent;
+        }
+
+        return null;
     }
 }
