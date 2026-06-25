@@ -24,7 +24,7 @@
 			"typo3/cms-composer-installers": true
 		}
 	},
-    "require": {
+ "require": {
 		"php": "^8.3",
 		"typo3/cms-backend": "^13.4 || ^14.3",
 		"typo3/cms-extbase": "^13.4 || ^14.3",

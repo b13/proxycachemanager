@@ -27,10 +27,18 @@ supported version is now TYPO3 v13 LTS; v14 is fully supported.
   TYPO3 major version. `\TYPO3\CMS\Core\Messaging\AbstractMessage::OK`,
   `::WARNING`, `::ERROR` were removed in TYPO3 v14; the controller now
   always uses `ContextualFeedbackSeverity::*` enum cases.
+* `Classes/Cache/Backend/ReverseProxyCacheBackend` no longer implements
+  `TransientBackendInterface` — on TYPO3 v14 that interface became a typed
+  contract incompatible with `Typo3DatabaseBackend`. As a result the
+  configured `VariableFrontend` now serializes (and HMAC-signs on v13.4+)
+  the stored page URLs. The backend reads them back through the frontend,
+  so reverse-proxy/CDN purging keeps working, and rows written by v4 (plain
+  URLs) are still handled via a fallback. No manual migration is required;
+  flushing the `tx_proxy` cache once after the upgrade is optional but tidy.
 
 ## Required platform
 
-* PHP 8.2+
+* PHP 8.3+
 * TYPO3 13.4+ or 14.x
 
 ---
