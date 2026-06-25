@@ -139,7 +139,7 @@ class ReverseProxyCacheBackend extends Typo3DatabaseBackend
      */
     protected function resolveCachedUrl(string $entryIdentifier, ?string $rawContent = null): ?string
     {
-        $url = $this->cache->get($entryIdentifier);
+        $url = $this->get($entryIdentifier);
         if (is_string($url) && $url !== '') {
             return $url;
         }
