@@ -42,7 +42,7 @@
 			"cms-package-dir": "{$vendor-dir}/typo3/cms",
 			"app-dir": ".Build",
 			"web-dir": ".Build/Web",
-			"version": "4.1.2",
+			"version": "5.0.1",
 			"Package": {
 				"providesPackages": {}
 			}
