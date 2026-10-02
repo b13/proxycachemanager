@@ -20,6 +20,7 @@ namespace B13\Proxycachemanager\Cache\Backend;
 use B13\Proxycachemanager\Provider\ProxyProviderInterface;
 use Psr\Log\LoggerAwareTrait;
 use TYPO3\CMS\Core\Cache\Backend\Typo3DatabaseBackend;
+use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -32,6 +33,17 @@ class ReverseProxyCacheBackend extends Typo3DatabaseBackend
 {
     use LoggerAwareTrait;
     protected ProxyProviderInterface $reverseProxyProvider;
+    protected ?FrontendInterface $frontend = null;
+
+    /**
+     * Keep a reference to the frontend: entries are serialized (and HMAC-signed)
+     * by the VariableFrontend, so only the frontend can turn them back into URLs.
+     */
+    public function setCache(FrontendInterface $cache): void
+    {
+        parent::setCache($cache);
+        $this->frontend = $cache;
+    }
 
     public function setReverseProxyProvider(ProxyProviderInterface $reverseProxyProvider)
     {
@@ -131,15 +143,15 @@ class ReverseProxyCacheBackend extends Typo3DatabaseBackend
      * contract is incompatible with Typo3DatabaseBackend), the configured
      * VariableFrontend serializes — and on v13.4+ HMAC-signs — every entry before
      * it is written to the database. Reads must therefore go through the frontend
-     * to obtain the original URL again; a raw column read would only yield the
-     * serialized blob.
+     * to obtain the original URL again; the backend's own get() only yields the
+     * serialized blob, which contains no parseable host and is dropped by providers.
      *
      * Rows written by older versions (TransientBackendInterface era) still hold the
      * plain URL and fail deserialization, so we fall back to the raw value for those.
      */
     protected function resolveCachedUrl(string $entryIdentifier, ?string $rawContent = null): ?string
     {
-        $url = $this->get($entryIdentifier);
+        $url = $this->frontend?->get($entryIdentifier);
         if (is_string($url) && $url !== '') {
             return $url;
         }
