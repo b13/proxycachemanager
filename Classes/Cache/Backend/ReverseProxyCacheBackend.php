@@ -18,6 +18,7 @@ namespace B13\Proxycachemanager\Cache\Backend;
  */
 
 use B13\Proxycachemanager\Provider\ProxyProviderInterface;
+use B13\Proxycachemanager\ProxyConfiguration;
 use Psr\Log\LoggerAwareTrait;
 use TYPO3\CMS\Core\Cache\Backend\Typo3DatabaseBackend;
 use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
@@ -32,7 +33,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class ReverseProxyCacheBackend extends Typo3DatabaseBackend
 {
     use LoggerAwareTrait;
-    protected ProxyProviderInterface $reverseProxyProvider;
+    protected ?ProxyProviderInterface $reverseProxyProvider = null;
     protected ?FrontendInterface $frontend = null;
 
     /**
@@ -51,15 +52,24 @@ class ReverseProxyCacheBackend extends Typo3DatabaseBackend
     }
 
     /**
+     * The provider is resolved lazily instead of being passed as cache option, so no
+     * object instance needs to be stored in $GLOBALS['TYPO3_CONF_VARS'].
+     * */
+    protected function getReverseProxyProvider(): ProxyProviderInterface
+    {
+        return $this->reverseProxyProvider ??= GeneralUtility::makeInstance(ProxyConfiguration::class)->getProxyProvider();
+    }
+
+    /**
      * Removes all cache entries of this cache.
      * Also let the proxy provider know to clear everything as well.
      */
     public function flush(): void
     {
         // make the HTTP Purge call
-        if ($this->reverseProxyProvider->isActive()) {
+        if ($this->getReverseProxyProvider()->isActive()) {
             $urls = $this->getAllCachedUrls();
-            $this->reverseProxyProvider->flushAllUrls($urls);
+            $this->getReverseProxyProvider()->flushAllUrls($urls);
         }
         parent::flush();
     }
@@ -71,12 +81,12 @@ class ReverseProxyCacheBackend extends Typo3DatabaseBackend
      */
     public function flushByTag($tag): void
     {
-        if ($this->reverseProxyProvider->isActive()) {
+        if ($this->getReverseProxyProvider()->isActive()) {
             $identifiers = $this->findIdentifiersByTag($tag);
             foreach ($identifiers as $entryIdentifier) {
                 $url = $this->resolveCachedUrl($entryIdentifier);
                 if ($url !== null) {
-                    $this->reverseProxyProvider->flushCacheForUrls([$url]);
+                    $this->getReverseProxyProvider()->flushCacheForUrls([$url]);
                 }
             }
         }
@@ -91,7 +101,7 @@ class ReverseProxyCacheBackend extends Typo3DatabaseBackend
      */
     public function flushByTags(array $tags): void
     {
-        if ($this->reverseProxyProvider->isActive()) {
+        if ($this->getReverseProxyProvider()->isActive()) {
             $identifiers = [];
             foreach ($tags as $tag) {
                 $identifiers = array_merge($identifiers, $this->findIdentifiersByTag($tag));
@@ -108,7 +118,7 @@ class ReverseProxyCacheBackend extends Typo3DatabaseBackend
             $urls = array_unique($urls);
 
             if ($urls !== []) {
-                $this->reverseProxyProvider->flushCacheForUrls($urls);
+                $this->getReverseProxyProvider()->flushCacheForUrls($urls);
             }
         }
 
