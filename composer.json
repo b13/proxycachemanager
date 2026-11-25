@@ -24,9 +24,10 @@
 			"typo3/cms-composer-installers": true
 		}
 	},
- "require": {
+	"require": {
 		"php": "^8.3",
 		"typo3/cms-backend": "^13.4 || ^14.3",
+		"typo3/cms-core": "^13.4 || ^14.3",
 		"typo3/cms-extbase": "^13.4 || ^14.3",
 		"typo3/cms-frontend": "^13.4 || ^14.3",
 		"typo3/cms-install": "^13.4 || ^14.3"
@@ -42,7 +43,7 @@
 			"cms-package-dir": "{$vendor-dir}/typo3/cms",
 			"app-dir": ".Build",
 			"web-dir": ".Build/Web",
-			"version": "5.0.1",
+			"version": "5.0.4",
 			"Package": {
 				"providesPackages": {}
 			}
